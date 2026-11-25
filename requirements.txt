@@ -1,0 +1,7 @@
+# Core Arb ball-arithmetic verification (verify_asymptotic.py and verify_all.py; tested on Python 3.13.17):
+python-flint==0.9.0
+
+# Supplementary screening, finite-k Laplace cross-checks, and helper scripts (scripts/):
+numpy==2.5.4
+scipy==1.18.1
+mpmath==1.4.1

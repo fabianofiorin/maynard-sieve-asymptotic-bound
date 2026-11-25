@@ -1,0 +1,1146 @@
+\documentclass[11pt, reqno]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Teorema}
+\newtheorem{corollary}[theorem]{Corollario}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}[lemma]{Proposizione}
+
+\theoremstyle{remark}
+\newtheorem{remark}[lemma]{Osservazione}
+
+\numberwithin{equation}{section}
+
+\DeclareMathOperator{\re}{Re}
+\DeclareMathOperator{\im}{Im}
+
+\newcommand{\Harm}{\mathsf{H}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\dd}{\,\mathrm{d}}
+
+\makeatletter
+\renewcommand{\subjclassname}{\textup{2020} Classificazione per soggetto}
+\renewcommand{\keywordsname}{Parole chiave}
+\makeatother
+
+\title[Stime asintotiche sul funzionale di Maynard]{%
+Stime inferiori asintotiche per il funzionale del crivello\\
+di Maynard e unicità alla microscala}
+
+\author{Fabiano Fiorin}
+\email{fabianofiorin06@gmail.com}
+
+\subjclass[2020]{Primaria 11N05, 11N36; Secondaria 65G20}
+\keywords{Intervalli limitati tra numeri primi, crivello di Maynard--Tao, somme di potenze
+simmetriche, trasformate di Laplace, aritmetica degli intervalli rigorosa}
+
+\begin{document}
+
+\begin{abstract}
+Stabiliamo una nuova stima inferiore asintotica per il funzionale variazionale del crivello
+di Maynard $M_k := \sup_F R_k(F)$ ($R_k(F) := k J(F)/I(F)$) per $k \to \infty$, migliorando
+la stima di Lewulis $M_k \ge \log k - 0.273572 + o(1)$ fino a
+\[
+M_k \ge \log k - 0.260989 + o(1).
+\]
+Questo progresso deriva dalla combinazione di due meccanismi: (i) una traslazione di ordine
+$O(k)$ della scala reciproca $a = k(\log k + \alpha)$ con $\alpha = -523/2000$, che riallinea
+il troncamento del simplesso $P_1 \le 1$ rispetto a una densità limite $1$-stabile asimmetrica,
+e (ii) l'arricchimento del fattore polinomiale radiale mediante la gerarchia completa graduata per
+peso $\Lambda_9$ dei prodotti di somme di potenze simmetriche $\prod_{r \in \lambda} (\sigma^r P_r)$
+estesa a tutte le $30$ partizioni intere $\lambda$ di peso al più $9$ con parti almeno $2$
+($N = 250$ parametri polinomiali). Restringendosi al livello di Bombieri--Vinogradov ($\theta = 1/2$)
+e assumendo condizionatamente la congettura di Elliott--Halberstam ($\theta = 1$), si migliorano le
+rispettive costanti principali per $H_m := \liminf_{n\to\infty}(p_{n+m}-p_n)$ a
+$H_m \le (5.1928517 + o(1))\,m\,e^{4m}$ e $H_m \le (2.5964259 + o(1))\,m\,e^{2m}$
+(mentre incondizionatamente per $m \to \infty$ l'equidistribuzione oltre $\theta = 1/2$ produce
+tassi di crescita esponenziali più piccoli). In direzione opposta, dimostriamo un Teorema di Unicità
+alla Microscala: tra i nuclei regolari di tipo reciproco $g(u)$ normalizzati a $m_0(g)=1$ e
+$g(u) \sim u^{-1}$ per $u \to \infty$, il nucleo di Cauchy $h(u) = (1+u)^{-1}$ è l'unico
+ottimo nella classe prodotto--radiale polinomiale, con ogni nucleo normalizzato $g \neq h$
+(q.o.) soggetto alla penalità stretta $-\int_0^\infty (1+u)(g(u) - h(u))^2 \dd u < 0$ (sicché,
+tra i nuclei non normalizzati, $h$ è unico a meno di riscalamento moltiplicativo e dilatazione
+positiva dell'argomento). Tutte le stime
+sono dimostrate analiticamente e certificate in modo deterministico in aritmetica Arb a $768$ bit
+tramite un verificatore indipendente basato su quadratura di Gauss--Legendre su ellissi di Bernstein.
+\end{abstract}
+
+\maketitle
+
+\section{Introduzione e risultati principali}
+
+Sia $p_n$ l'$n$-esimo numero primo e poniamo $H_m := \liminf_{n\to\infty}(p_{n+m} - p_n)$ per ogni
+intero $m \ge 1$. Sulla scia del risultato di Zhang \cite{Zhang} e del metodo di
+Goldston--Pintz--Y{\i}ld{\i}r{\i}m \cite{GPY}, Maynard \cite{Maynard} e Tao hanno ricondotto la
+ricerca di intervalli limitati tra numeri primi in $k$-uple ammissibili alla massimizzazione del
+quoziente di Rayleigh simmetrico $R_k(F) := k J(F)/I(F)$ sul $k$-simplesso
+$\cR_k := \{(t_1,\dots,t_k) \in [0,\infty)^k : t_1 + \cdots + t_k \le 1\}$, dove
+\begin{align*}
+I(F) &:= \int_{\cR_k} F(t_1,\dots,t_k)^2 \dd t_1\cdots \dd t_k, \\
+J(F) &:= \int_{\cR_{k-1}} \left(\int_0^{1-\sum_{i=1}^{k-1} t_i}
+F(t_1,\dots,t_k)\dd t_k \right)^{\!2} \dd t_1\cdots \dd t_{k-1},
+\end{align*}
+e $M_k := \sup_F R_k(F)$ varia sulle funzioni simmetriche localmente a quadrato integrabile con
+$I(F) > 0$. Per \cite[Teoremi~22 e~26]{PM8b} (con $\varepsilon = 0$), se i numeri primi si equidistribuiscono nelle
+progressioni aritmetiche a livello $\vartheta \in (0, 1)$, allora $M_k > 2m/\vartheta$ implica
+$H_m \le H(k)$, il diametro minimo di una $k$-upla ammissibile; il teorema di Bombieri--Vinogradov
+fornisce incondizionatamente $\vartheta = 1/2$ ($M_k > 4m$), mentre la congettura di Elliott--Halberstam
+corrisponde a $\theta = 1$ (ossia $\mathrm{EH}[\vartheta]$ valida per ogni $\vartheta \in (0, 1)$,
+fornendo $H_m \le H(k)$ ogniqualvolta $M_k > 2m$).
+
+Asintoticamente per $k \to \infty$, Maynard \cite{Maynard} ha ottenuto
+$M_k \ge \log k - 2\log\log k - 2 + o(1)$, e Polymath8b \cite[Sezione~6, Corollario~37]{PM8b}
+ha provato $M_k \ge \log k - O(1)$ insieme alla barriera superiore
+\begin{equation}\label{eq:pm8b-barrier}
+M_k \le \frac{k}{k-1}\log k \qquad (k \ge 2),
+\end{equation}
+che obbliga qualsiasi stima inferiore $M_k \ge \log k - c^* + o(1)$ a soddisfare $c^* \ge 0$.
+Combinando stime di equidistribuzione oltre $\theta = 1/2$ si ottengono tassi esponenziali
+incondizionati strettamente inferiori per $H_m$ ($m \to \infty$): Polymath8b \cite{PM8b} ha provato
+$H_m \ll m\exp\bigl((4-\tfrac{28}{157})m\bigr)$, e Stadlmann \cite{Stadlmann2025} ha migliorato la
+crescita mediante equidistribuzione a moduli lisci ($\theta = \tfrac{1}{2}+\tfrac{1}{40}-\varepsilon$)
+a $H_m = O(\exp(3.8075 m))$ (e successivamente $H_1 \le 240$ \cite{Stadlmann2026}).
+
+Recentemente, Lewulis \cite{Lewulis} ha analizzato la rappresentazione di Laplace esatta di $I(F)$
+e $J(F)$ per l'ansatz radiale reciproco
+$F(t_1,\dots,t_k) = \widetilde{Q}((\log k)(1-P_1)) \prod_{i=1}^k (1 + a t_i)^{-1}$
+($P_r := \sum_{i=1}^k t_i^r$) a scala $a = k\log k$, ottimizzando su polinomi $\widetilde{Q}$
+di grado al più $20$ per dimostrare \cite[Teorema~3]{Lewulis}:
+\begin{equation}\label{eq:lewulis-bound}
+M_k \ge \log k - 0.273572 + o(1) \qquad (k \to \infty).
+\end{equation}
+
+In questo lavoro caratterizziamo la barriera alla microscala di~\eqref{eq:lewulis-bound} e
+superiamo il suo limite radiale macroscopico. In tutto l'articolo, $\gamma = 0.57721566\dots$
+indica la costante di Eulero--Mascheroni, $L := \log k$ e $\Harm_n := \sum_{j=1}^n j^{-1}$
+($\Harm_0 := 0$) l'$n$-esimo numero armonico.
+
+\begin{theorem}[Unicità alla Microscala]\label{thm:uniqueness}
+Sia $h(u) := (1+u)^{-1}$ per $u \ge 0$, e sia $g \colon [0,\infty) \to \R$ una funzione misurabile
+che soddisfa:
+\begin{enumerate}
+\item[(H1)] $g \in L^2(0,\infty) \cap L^4(0,\infty)$ e $m_0(g) := \int_0^\infty g(u)^2 \dd u > 0$;
+\item[(H2)] $g(u) = c u^{-1} + O(u^{-1-\delta})$ per $u \to \infty$, per qualche $c \in \R \setminus \{0\}$ e $\delta > 0$.
+\end{enumerate}
+Poniamo $\tilde{g} := c^{-1} g$, $\lambda := m_0(\tilde{g})^{-1} = c^2 / m_0(g) > 0$ e
+$g^*(u) := \lambda \tilde{g}(\lambda u) = \frac{c}{m_0(g)} g\bigl(\frac{c^2}{m_0(g)} u\bigr)$
+(si noti che (H1)--(H2) implicano già $\int_0^\infty u(g^*(u)-h(u))^2\dd u < \infty$). Sia $\widetilde{Q}$
+un qualunque polinomio reale non nullo, poniamo $\sigma := \log k + \alpha$, $a := \lambda k\sigma$,
+$a' := k\sigma$, e definiamo
+\begin{equation}\label{eq:Fg-def}
+F_g(t_1,\dots,t_k) := \widetilde{Q}\bigl(\sigma(1 - P_1)\bigr) \prod_{i=1}^k g(a t_i).
+\end{equation}
+Allora $m_0(g^*) = 1$, $g^*(u) = u^{-1} + O(u^{-1-\delta})$ per $u \to \infty$, e per invarianza di
+scala $R_k(F_g)$ alla scala $a = \lambda k \sigma$ coincide con $R_k(F_{g^*})$ alla scala $a'$.
+Inoltre, per ogni $\alpha \in \R$ il limite $\eta(g^*; \alpha, \widetilde{Q}) := \lim_{k\to\infty}(R_k(F_{g^*}) - \log k)$
+esiste, è finito e soddisfa l'identità puntuale di covarianza per traslazione
+$\eta(g^*; \alpha, \widetilde{Q}) = (\kappa(g^*) - \gamma) + \eta\bigl(h; \alpha + c_1(g^*) - \gamma, \widetilde{Q}\bigr)$,
+dove $c_1(g^*) := \gamma - \int_0^\infty u(g^*(u)^2 - h(u)^2)\dd u \in \R$, e gli
+estremi superiori finiti verificano
+\begin{equation}\label{eq:shift-covariance}
+\sup_{\alpha \in \R} \eta(g^*; \alpha, \widetilde{Q})
+= \bigl(\kappa(g^*) - \gamma\bigr) + \sup_{\alpha' \in \R} \eta(h; \alpha', \widetilde{Q}),
+\end{equation}
+dove
+\begin{equation}\label{eq:kappa-penalty}
+\kappa(g^*) - \gamma
+= -\int_0^\infty (1+u)\bigl(g^*(u) - h(u)\bigr)^2 \dd u \le 0,
+\end{equation}
+con uguaglianza se e solo se $g^*(u) = h(u)$ quasi ovunque su $(0,\infty)$, ossia
+$g(u) = C/(1 + \theta u)$ quasi ovunque per opportune costanti $C \in \R \setminus \{0\}$ e
+$\theta > 0$ (unicità a meno di riscalamento moltiplicativo e dilatazione positiva dell'argomento).
+\end{theorem}
+
+Il Teorema~\ref{thm:uniqueness} dimostra che nessun miglioramento asintotico oltre~\eqref{eq:lewulis-bound}
+può provenire dalla variazione del fattore reciproco di microscala $g(u)$ nella classe radiale.
+I guadagni vanno quindi cercati nella struttura polinomiale macroscopica su $\cR_k$: traslando
+$a = k(\log k + \alpha)$ di uno scostamento $O(k)$ con $\alpha < 0$ e aggiungendo somme di potenze
+simmetriche di ordine superiore $P_r = \sum_{i=1}^k t_i^r$.
+
+Sia $\Lambda_9$ l'insieme di tutte le $30$ partizioni intere
+$\lambda = (\lambda_1, \dots, \lambda_{\ell(\lambda)})$ con
+$\lambda_1 \ge \cdots \ge \lambda_{\ell(\lambda)} \ge 2$ e $|\lambda| := \sum_{j=1}^{\ell(\lambda)} \lambda_j \le 9$,
+raggruppate per peso $|\lambda| \in \{0, 2, \dots, 9\}$ (inclusa la partizione vuota $()$):
+\begin{equation}\label{eq:Lambda9-list}
+\begin{aligned}
+\Lambda_9 = \bigl\{ &(),\ (2),\ (3),\ (4),\ (2,2),\ (5),\ (3,2),\ (6),\ (4,2),\ (3,3),\\
+&(2,2,2),\ (7),\ (5,2),\ (4,3),\ (3,2,2),\ (8),\ (6,2),\ (5,3),\\
+&(4,4),\ (4,2,2),\ (3,3,2),\ (2,2,2,2),\ (9),\ (7,2),\ (6,3),\\
+&(5,4),\ (5,2,2),\ (4,3,2),\ (3,3,3),\ (3,2,2,2)\bigr\}.
+\end{aligned}
+\end{equation}
+
+\begin{theorem}[Stima asintotica certificata su $M_k$]\label{thm:main}
+Siano $L := \log k$, $\sigma := L + \alpha$ e $a := k\sigma$. Scegliendo l'ansatz simmetrico
+sulle partizioni in~\eqref{eq:Lambda9-list},
+\begin{equation}\label{eq:ansatz-C}
+F(t_1,\dots,t_k) = \left[ \sum_{\lambda \in \Lambda_9}
+\widetilde{Q}_\lambda\bigl(\sigma(1-P_1)\bigr)
+\prod_{j=1}^{\ell(\lambda)} \bigl(\sigma^{\lambda_j} P_{\lambda_j}\bigr) \right]
+\prod_{i=1}^k \frac{1}{1 + a t_i}
+\end{equation}
+alla traslazione razionale esatta $\alpha = -523/2000 = -0.2615$, con polinomi certificati
+$\widetilde{Q}_\lambda$ di gradi graduati per peso $20, 14, 12, 10, 8, 8, 6, 6, 5$ per
+$|\lambda| \in \{0, 2, \dots, 9\}$ rispettivamente ($30$ blocchi, $N = 250$ parametri), vale
+incondizionatamente per $k \to \infty$:
+\begin{equation}\label{eq:main-bound}
+M_k \ge \log k - c^* + o(1), \qquad c^* := -\eta_* \le 0.26098863656469156542,
+\end{equation}
+dove $\eta_* := \frac{c^\top D_{\mathrm{net}}(\alpha) c}{c^\top I(\alpha) c}$ è il valore del quoziente di
+Rayleigh certificato (Proposizione~\ref{prop:UL-reduction}, \eqref{eq:quotient-limit} e~\eqref{eq:eta-cert}). In particolare,
+la certificazione per intervalli Arb a $768$ bit fornisce anche la stima più stringente
+$c^* \le 0.2609886365646915654192$.
+\end{theorem}
+
+Il Teorema~\ref{thm:main} migliora la costante~\eqref{eq:lewulis-bound} di Lewulis di oltre
+$0.012583$. I due meccanismi contribuiscono in modo complementare:
+il solo ansatz radiale di grado~$20$ alla traslazione razionale $\alpha = -3367/10000$ ottiene
+$c_{\mathrm{rad}}^* \le 0.2654546851$ (guadagnando circa $0.008117$ rispetto a~\eqref{eq:lewulis-bound}),
+mentre la gerarchia graduata $\Lambda_9$ delle somme di potenze simmetriche apporta gli ulteriori
+$\approx 0.004466$ fino a $0.26098863656469156542$ (spostando l'ottimo congiunto a $\alpha = -523/2000$).
+Le conseguenze su $H_m$ seguono nel corollario seguente.
+
+\begin{corollary}[Costanti asintotiche per gli intervalli tra numeri primi]\label{cor:Hm}
+Dal Teorema~\ref{thm:main} e da \cite[Teoremi~22 e~26]{PM8b}:
+\begin{enumerate}
+\item[(i)] \textbf{Regime di puro Bombieri--Vinogradov ($\theta = 1/2$, senza usare $\theta > 1/2$):}
+Per $m \to \infty$,
+\[
+H_m \le \bigl(4 e^{c^*} + o(1)\bigr)\,m\,e^{4m} \le \bigl(5.1928517 + o(1)\bigr)\,m\,e^{4m}.
+\]
+\item[(ii)] \textbf{Regime di Elliott--Halberstam ($\theta = 1$, condizionale):} Assumendo la
+congettura di Elliott--Halberstam, per $m \to \infty$,
+\[
+H_m \le \bigl(2 e^{c^*} + o(1)\bigr)\,m\,e^{2m} \le \bigl(2.5964259 + o(1)\bigr)\,m\,e^{2m}.
+\]
+\end{enumerate}
+Incondizionatamente per $m \to \infty$, l'equidistribuzione oltre $\theta = 1/2$ \cite{PM8b, Stadlmann2025}
+produce tassi di crescita esponenziali strettamente minori fino a $H_m = O(\exp(3.8075 m))$ \cite{Stadlmann2025}.
+\end{corollary}
+
+\begin{proof}[Dimostrazione]
+Fissiamo $\theta \in \{1/2, 1\}$. Per $k \ge 3$ intero, poniamo
+$\varepsilon(k) := \max(0,\, \log k - c^* - M_k)$; per la~\eqref{eq:main-bound} del Teorema~\ref{thm:main},
+$\varepsilon(k) \to 0$ per $k \to \infty$. Definiamo $K_m := \lceil \exp(2m/\theta + c^*) \rceil$
+e $\delta_m := \sup_{k \ge K_m} \varepsilon(k) + m^{-1} \to 0^+$ per $m \to \infty$.
+Scegliendo $k_m := \lceil \exp(2m/\theta + c^* + \delta_m) \rceil \ge K_m$, abbiamo
+$\varepsilon(k_m) \le \delta_m - m^{-1}$, per cui
+\[
+M_{k_m} \ge \log k_m - c^* - \varepsilon(k_m)
+\ge \left(\frac{2m}{\theta} + c^* + \delta_m\right) - c^* - \bigl(\delta_m - m^{-1}\bigr)
+= \frac{2m}{\theta} + \frac{1}{m}.
+\]
+Ponendo $\vartheta := 1/2$ per $\theta = 1/2$ e
+$\vartheta := \vartheta_m := \frac{2m}{2m + 1/(2m)} \in (0, 1)$ per $\theta = 1$ (assumendo $\mathrm{EH}[\vartheta]$
+per ogni $\vartheta \in (0, 1)$), si ha $\frac{2m}{\vartheta} \in \{4m,\, 2m + \frac{1}{2m}\}$ e
+$\frac{2m}{\vartheta} < \frac{2m}{\theta} + \frac{1}{m} \le M_{k_m}$; applicando
+\cite[Teoremi~22 e~26]{PM8b} (con $\varepsilon = 0$) al livello $\vartheta \in (0, 1)$ segue $H_m \le H(k_m)$ per $m$ grande. Prendendo la $k_m$-upla ammissibile costituita dai primi $k_m$
+numeri primi strettamente maggiori di $k_m$, il Teorema dei Numeri Primi fornisce
+$H(k_m) \le (1+o(1)) k_m \log k_m$. Sostituendo $k_m = (1+o(1)) e^{c^*} e^{2m/\theta}$ e
+$\log k_m = (2/\theta + o(1)) m$ segue $H_m \le (\frac{2}{\theta} e^{c^*} + o(1)) m e^{2m/\theta}$.
+Infine, valutando $4 e^{c^*}$ e $2 e^{c^*}$ per $c^* = -\eta_*$ (arrotondati verso l'esterno a $20$ cifre
+decimali dalla sfera Arb a $768$ bit) si ottiene
+\begin{align*}
+4 e^{c^*} &\in [5.1928516527656657000 \pm 3.93\times 10^{-20}] < 5.1928517, \\
+2 e^{c^*} &\in [2.5964258263828328500 \pm 1.97\times 10^{-20}] < 2.5964259. \qedhere
+\end{align*}
+\end{proof}
+
+\begin{table}[ht]
+\centering
+\caption{Confronto tra le stime asintotiche su $\log k - M_k$ e le costanti principali
+implicate su $H_m$ ($m \to \infty$) nei regimi Bombieri--Vinogradov ($\theta = 1/2$) ed
+Elliott--Halberstam ($\mathrm{EH}$); la riga PM8b riporta la barriera superiore di crivello~\eqref{eq:pm8b-barrier} sul coefficiente del metodo.}\label{tab:summary}
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Metodo / Risultato & Stima su $\log k - M_k$ & BV puro ($4e^{c^*}$) & EH ($2e^{c^*}$) \\
+\midrule
+Maynard \cite{Maynard} & $\le 2\log\log k + 2 + o(1)$ & div.\ ($O(m^3 e^{4m})$) & div.\ ($O(m^3 e^{2m})$) \\
+Lewulis \cite{Lewulis} ($\alpha = 0$, $\deg 20$) & $\le 0.273572 + o(1)$ & $5.2586081$ & $2.6293041$ \\
+\textbf{Teorema~\ref{thm:main}} ($\alpha = -\tfrac{523}{2000}$, $\Lambda_9$, $N = 250$) & $\mathbf{\le 0.2609886366} + o(1)$ & $\mathbf{5.1928517}$ & $\mathbf{2.5964259}$ \\
+\midrule
+Barriera crivello PM8b \cite{PM8b} & $\ge -\tfrac{\log k}{k-1}$ & $\ge 4$ & $\ge 2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La Tabella~\ref{tab:summary} confronta il Teorema~\ref{thm:main} e il Corollario~\ref{cor:Hm} con i
+risultati precedenti. La Sezione~\ref{sec:uniqueness} dimostra il Teorema~\ref{thm:uniqueness}; la Sezione~\ref{sec:laplace}
+ricava le formule di Laplace esatte a $k$ finito mediante partizioni d'insieme per $\Lambda_W$;
+la Sezione~\ref{sec:asymptotic} effettua il passaggio al limite $k \to \infty$ riducendolo a forme
+quadratiche razionali in momenti monodimensionali; la Sezione~\ref{sec:cert} espone la certificazione
+Arb a $768$ bit e i controlli a $k$ finito; infine la Sezione~\ref{sec:repro} raccoglie i dati di
+riproducibilità.
+
+\section{Dimostrazione del Teorema di Unicità alla Microscala}\label{sec:uniqueness}
+
+In tutto il testo, $\log z$ denota la determinazione principale del logaritmo complesso su
+$\C \setminus (-\infty, 0]$. Per $\alpha \in \R$ e $z = 1 + i\tau$ ($\tau \in \R$), poniamo
+\begin{equation}\label{eq:Phi-nu-def}
+\Phi_\alpha(z) := z(\gamma + \alpha + \log z),
+\qquad
+\nu_\alpha(x) := \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau) - (1+i\tau)x}\dd\tau.
+\end{equation}
+Poiché $\re\Phi_\alpha(1+i\tau) = \gamma + \alpha + \frac{1}{2}\log(1+\tau^2) - \tau\arctan\tau$, si ha
+\begin{equation}\label{eq:Phi-abs}
+\bigl|e^{\Phi_\alpha(1+i\tau)}\bigr|
+= e^{\gamma+\alpha} \sqrt{1+\tau^2}\, e^{-\tau\arctan\tau},
+\end{equation}
+cosicché $\nu_\alpha(x)$ è continua su $\R$ e decade almeno come $O_\alpha(e^{-x})$.
+
+\begin{lemma}[Positività e analiticità di $\nu_\alpha$]\label{lem:nu-pos}
+Per ogni $\alpha \in \R$, $\nu_\alpha$ si estende olomorficamente alla striscia
+$\{x \in \C : |\im x| < \pi/2\}$, soddisfa $\nu_\alpha(x) \ge 0$ per ogni $x \in \R$, e non è
+identicamente nulla su $(0,\infty)$. Pertanto, per ogni polinomio reale non nullo $\widetilde{Q}$,
+$\int_0^\infty \widetilde{Q}(x)^2 \nu_\alpha(x)\dd x > 0$.
+\end{lemma}
+
+\begin{proof}[Dimostrazione]
+Se $|\im x| \le \frac{\pi}{2} - \eta$ ($\eta > 0$), da $\arctan|\tau| \ge \frac{\pi}{2} - \frac{1}{|\tau|}$
+segue $\re(-(1+i\tau)x) - |\tau|\arctan|\tau| \le -\re x - \eta|\tau| + 1$. Quindi l'integranda
+in~\eqref{eq:Phi-nu-def} è maggiorata localmente uniformemente da $O_{\alpha,\eta}(e^{-\re x}(1+|\tau|)e^{-\eta|\tau|})$,
+dimostrando l'olomorfia su $\{|\im x| < \pi/2\}$ e l'analiticità reale su $\R$.
+
+Per il Lemma~\ref{lem:W0-props} seguente (la cui dimostrazione utilizza esclusivamente la definizione di
+$W_0$ ed è indipendente dalla Sezione~\ref{sec:uniqueness}), per $a = k\sigma$ si ha
+$W_0(\sigma(1+i\tau); k\sigma)/W_0(\sigma; k\sigma) = W_0((1+i\tau)/k; 1)/W_0(1/k; 1)$.
+Sia $C_k(X; a) \ge 0$ la densità di convoluzione $k$-upla di $t \mapsto (1+at)^{-2}$ ($t \ge 0$).
+Poiché $t \mapsto (1+at)^{-2} \in L^1 \cap L^2$, il teorema di Plancherel implica
+$W_0(\sigma+i\omega; a) \in L^2(\R_\omega)$, quindi $W_0(\sigma+i\omega; a)^k \in L^1(\R_\omega)$
+per $k \ge 2$, e l'inversione di Laplace in $X = 1 - x/\sigma$ ($s = \sigma(1+i\tau)$) porge
+\[
+\frac{C_k(1 - x/\sigma; k\sigma)}{\sigma e^{\sigma - (\gamma+\alpha)} W_0(\sigma; k\sigma)^k}
+= \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau - (1+i\tau)x + (\gamma+\alpha)}
+\left(\frac{W_0((1+i\tau)/k; 1)}{W_0(1/k; 1)}\right)^{\!k}\dd\tau.
+\]
+Decomponendo $\tau \in \R$ alle soglie $T := 100 L$ e $4k$ per $k$ grande: su $|\tau| \le T$, il
+Lemma~\ref{lem:W0-props}(iv) esprime l'integranda come
+$e^{\Phi_\alpha(1+i\tau)-(1+i\tau)x}(1 + O(L^4/k))$, dominata da
+$O_{\alpha,x}(|e^{\Phi_\alpha(1+i\tau)}|) \in L^1(\R)$; su $T < |\tau| \le 4k$, il
+Lemma~\ref{lem:W0-props}(ii),(iv) forniscono $|W_0((1+i\tau)/k; 1)/W_0(1/k; 1)|^k \ll L e^{-\pi T/2} \ll k^{-150}$;
+su $|\tau| > 4k$, il Lemma~\ref{lem:W0-props}(iii) dà $\int_{|\tau|>4k} (5k/(2|\tau|))^k \dd\tau \ll k(5/8)^k$.
+Passando al limite $k \to \infty$ si ottiene $\nu_\alpha(x) \ge 0$ per ogni $x \in \R$ come limite
+della densità normalizzata non negativa al primo membro.
+
+Poniamo ora $p_\alpha(x) := e^x \nu_\alpha(x) \ge 0$ e fissiamo $c \ge 1$. Su $1 \le \re z \le c$ si
+ha $\re\Phi_\alpha(u+i\tau) \sim -\frac{\pi}{2}|\tau|$ uniformemente per $|\tau| \to \infty$, sicché
+il teorema di Cauchy sposta il cammino da $\re z = 1$ a $\re z = c$, ottenendo
+\[
+f(x) := e^{(c-1)x} p_\alpha(x) = \frac{1}{2\pi}\int_{-\infty}^\infty g(\tau) e^{-i\tau x}\dd\tau,
+\qquad g(\tau) := e^{\Phi_\alpha(c+i\tau)}.
+\]
+Poiché $\Phi_\alpha'(z) = \gamma + \alpha + 1 + \log z$ e $\Phi_\alpha''(z) = 1/z$ soddisfano
+$|\Phi_\alpha'(c+i\tau)| \ll_{c,\alpha} 1 + \log(1+|\tau|)$, $|\Phi_\alpha''(c+i\tau)| \le 1$ e
+$|g(\tau)| \ll_{c,\alpha} e^{-\pi|\tau|/4}$, si ha $g, g', g'' \in L^1(\R_\tau)$ con limite nullo a
+$\pm\infty$. Due integrazioni per parti danno $|f(x)| \le \frac{1}{2\pi}\min(\|g\|_{L^1}, x^{-2}\|g''\|_{L^1})$,
+cioè $0 \le f(x) \le C_{c,\alpha}/(1+x^2) \in L^1(\R)$. L'inversione di Fourier in $L^1(\R)$ valutata
+in $\tau = 0$ produce quindi $\int_{-\infty}^\infty p_\alpha(x)\dd x = e^{\gamma+\alpha}$ (per $c = 1$)
+e $\int_{-\infty}^\infty e^{(c-1)x} p_\alpha(x)\dd x = e^{c(\gamma+\alpha+\log c)} \to +\infty$ per $c \to \infty$.
+Se $p_\alpha$ fosse identicamente nulla su $(0,\infty)$, il primo membro sarebbe maggiorato da
+$\int_{-\infty}^0 p_\alpha(x)\dd x \le e^{\gamma+\alpha}$ per ogni $c > 1$, un assurdo. Per analiticità reale,
+gli zeri di $\nu_\alpha$ su $\R$ sono isolati e dunque $\int_0^\infty \widetilde{Q}(x)^2 \nu_\alpha(x)\dd x > 0$.
+\end{proof}
+
+\begin{proof}[Dimostrazione del Teorema~\ref{thm:uniqueness}]
+Poniamo $\tilde{g} := c^{-1} g$, $\lambda := c^2 / m_0(g) > 0$ e $g^*(u) := \lambda \tilde{g}(\lambda u)$.
+
+\smallskip
+\noindent\textbf{Passo 1: Normalizzazione e invarianza di scala.}
+Con il cambio di variabile $v = \lambda u$ si ottiene $m_0(g^*) = \lambda m_0(\tilde{g}) = 1$,
+$g^* \in L^2 \cap L^4$ e, per~(H2), $g^*(u) = u^{-1} + O_g(u^{-1-\delta})$ per $u \to \infty$.
+Per $a = \lambda k\sigma$ e $a' = k\sigma$, vale $g(a t_i) = \frac{m_0(g)}{c} g^*(a' t_i)$, sicché
+il prefattore $(m_0(g)/c)^k$ si semplifica in $R_k(F_g) = k J(F_g)/I(F_g) = R_k(F_{g^*})$.
+
+\smallskip
+\noindent\textbf{Passo 2: Costante dell'integrale interno $\beta_*$ e rappresentazione di Laplace.}
+Poiché $g^*, h \in L^2_{\mathrm{loc}}[0,\infty)$ e $g^*(u) - h(u) = O_g(u^{-1-\delta})$ all'infinito,
+segue $g^* - h \in L^1(0,\infty)$ e definiamo $\beta_* := \int_0^\infty (g^*(u) - h(u))\dd u$.
+Essendo $(g^*)^2 \in L^1 \cap L^2$, posto $W_{g^*}(\zeta) := \int_0^\infty g^*(u)^2 e^{-\zeta u}\dd u$
+($\re\zeta > 0$), il teorema di Plancherel assicura $\omega \mapsto W_{g^*}((\sigma+i\omega)/a') \in L^2(\R)$;
+ponendo $v_{Q, g^*}(y) := \int_0^y \widetilde{Q}(\sigma(y-t))\, g^*(a' t)\dd t$ ($y \ge 0$) e
+combinando con la stima $|v_{Q, g^*}(y)| \ll_{Q, a'} (1+y)^{d+1/2}$ ($d = \deg\widetilde{Q}$), per $k \ge 3$ si ha
+assoluta integrabilità e valgono le formule esatte (cfr.\ \cite[Teorema~4]{Lewulis}):
+\begin{align*}
+I(F_{g^*}) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty} K_Q(s)\, W_{g^*}(s/a')^k (a')^{-k}\dd s, \\
+J(F_{g^*}) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty} e^s W_{g^*}(s/a')^{k-1}(a')^{-(k-1)} V_{Q,g^*}(s)\dd s,
+\end{align*}
+con $K_Q(s) = \int_0^1 \widetilde{Q}(\sigma(1-X))^2 e^{sX}\dd X$ e
+$V_{Q,g^*}(s) = \int_0^\infty v_{Q,g^*}(y)^2 e^{-sy}\dd y$.
+Nelle coordinate macroscopiche $x = \sigma y$, $u = k\sigma t$, $s = \sigma z$ ($z = 1+i\tau$),
+\[
+\sigma^3 k^2 V_{Q, g^*}(\sigma z)
+= \int_0^\infty \left(\int_0^{kx} \widetilde{Q}\!\left(x - \frac{u}{k}\right) g^*(u)\dd u\right)^{\!2} e^{-zx}\dd x.
+\]
+Sviluppando $\widetilde{Q}(x-u/k) = \widetilde{Q}(x) + \sum_{j=1}^d \frac{(-1)^j \widetilde{Q}^{(j)}(x)}{j! k^j} u^j$
+e scrivendo $g^* = h + (g^* - h)$ si ricava
+\[
+\int_0^{kx} \widetilde{Q}\!\left(x - \frac{u}{k}\right) g^*(u)\dd u
+= L\,\widetilde{Q}(x) + \widetilde{Q}(x)(\log x + \beta_*) - (\cH\widetilde{Q})(x) + \widetilde{R}_k(x),
+\]
+dove $(\cH\widetilde{Q})(x) := -\int_0^x \frac{\widetilde{Q}(x-w)-\widetilde{Q}(x)}{w}\dd w = \sum_{j=0}^d c_j \Harm_j x^j$
+per $\widetilde{Q}(x) = \sum_{j=0}^d c_j x^j$. Verifichiamo che $\|\widetilde{R}_k\|_{L^2(e^{-x}\dd x)} \to 0$:
+\begin{itemize}
+\item La parte dovuta ad $h$ in $\widetilde{R}_k$ è stimata nel Lemma~\ref{lem:uniform-W-V}(ii)
+(indipendentemente dalla Sezione~\ref{sec:uniqueness}) con norma $L^2(e^{-x}\dd x)$ pari a $O_{\widetilde{Q}}(k^{-1/2})$.
+\item La coda $-\widetilde{Q}(x)\int_{kx}^\infty (g^*(u)-h(u))\dd u$ converge a $0$ puntualmente ed è
+dominata da $\|g^*-h\|_{L^1}|\widetilde{Q}(x)| \in L^2(e^{-x}\dd x)$.
+\item Per ogni $1 \le j \le d$, scegliamo $U \ge 1$ tale che $|g^*(u)-h(u)| \ll_g u^{-1-\delta'}$ per
+$u \ge U$, con $\delta' := \min(\delta, 1/2) \in (0, 1/2]$ (sicché $j - \delta' \ge 1/2$). Per $k \ge U^2$ ($\sqrt{k} \ge U$),
+spezzando $k^{-j}\int_0^{kx} u^j |g^*-h|\dd u$ in $\min(kx, \sqrt{k})$ si ottiene $\le k^{-1/2}\|g^*-h\|_{L^1}$
+su $[0, \min(kx, \sqrt{k})]$, mentre la seconda parte su $[\min(kx, \sqrt{k}), kx]$ è nulla quando
+$kx \le \sqrt{k}$ ed è $\ll_g k^{-j}\int_{\sqrt{k}}^{kx} u^{j-1-\delta'}\dd u \le \frac{x^{j-\delta'}}{(j-\delta')k^{\delta'}}$
+per $kx > \sqrt{k}$; entrambe le stime sono infinitesime in $L^2(e^{-x}\dd x)$.
+\end{itemize}
+Sviluppando il quadrato contro $e^{-zx}$ ($|e^{-zx}| = e^{-x}$) tramite Cauchy--Schwarz segue, uniformemente in $\tau \in \R$:
+\begin{equation}\label{eq:Vg-exp}
+\sigma^3 k^2 V_{Q, g^*}(\sigma z) = L^2 N_0(\tau) + 2L\bigl(N_1(\tau) + \beta_* N_0(\tau)\bigr) + o_{\widetilde{Q}, g}(L),
+\end{equation}
+dove $N_0(\tau) := \int_0^\infty \widetilde{Q}(x)^2 e^{-zx}\dd x$ e
+$N_1(\tau) := \int_0^\infty \widetilde{Q}(x)\bigl(\widetilde{Q}(x)\log x - (\cH\widetilde{Q})(x)\bigr) e^{-zx}\dd x$;
+in particolare $\sigma^3 k^2 |V_{Q, g^*}(\sigma z)| \ll_{\widetilde{Q}, g} L^2$.
+
+\smallskip
+\noindent\textbf{Passo 3: Sviluppo uniforme di Laplace per $W_{g^*}(\zeta)$.}
+Con $U \ge 1$ dal Passo~2 e $\delta' := \min(\delta, 1/2) \in (0, 1/2]$,
+$\int_0^\infty u(g^*(u)-h(u))^2\dd u \le U\|g^*-h\|_{L^2}^2 + O_g(\int_U^\infty u^{-1-2\delta'}\dd u) < \infty$.
+Poiché $0 \le u h(u) \le 1$ e $g^*-h \in L^1$, l'identità
+$u((g^*)^2 - h^2) = u(g^*-h)^2 + 2u h(u)(g^*-h)$ implica $u((g^*)^2-h^2) \in L^1(0,\infty)$, per cui è
+ben definita la costante
+\[
+c_1(g^*) := \gamma - \int_0^\infty u\bigl(g^*(u)^2 - h(u)^2\bigr)\dd u.
+\]
+Essendo $\int_0^\infty (g^*(u)^2 - h(u)^2)\dd u = m_0(g^*) - m_0(h) = 0$, per $\re\zeta > 0$ si ha
+\[
+\frac{W_{g^*}(\zeta) - W_h(\zeta)}{\zeta} + \int_0^\infty u\bigl(g^*(u)^2 - h(u)^2\bigr)\dd u
+= \int_0^\infty \bigl(g^*(u)^2 - h(u)^2\bigr)\frac{e^{-\zeta u} - 1 + \zeta u}{\zeta}\dd u.
+\]
+Usando $|e^{-w}-1| \le |w|$ e $|e^{-w}-1+w| \le |w|^2/2$ ($\re w \ge 0$), il nucleo verifica
+$|(e^{-\zeta u}-1+\zeta u)/\zeta| \le \min(2u, \frac{1}{2}|\zeta| u^2)$. Spezzando in $u = |\zeta|^{-1/2}$
+rispetto al maggiorante integrabile $2u|(g^*)^2-h^2|$, l'integrale tende a $0$ uniformemente per $|\zeta| \to 0$
+in $\{\re\zeta > 0\}$. Combinando con $W_h(\zeta) = 1 + \zeta\log\zeta + \gamma\zeta + O(|\zeta|^2(1+|\log\zeta|))$
+(Lemma~\ref{lem:W0-props} sotto), otteniamo
+\begin{equation}\label{eq:Wg-exp}
+W_{g^*}(\zeta) = 1 + \zeta\log\zeta + c_1(g^*)\zeta + r_g(\zeta),
+\qquad \sup_{\re\zeta > 0,\, |\zeta| \le r} \frac{|r_g(\zeta)|}{|\zeta|} \xrightarrow[r\to 0^+]{} 0.
+\end{equation}
+
+\smallskip
+\noindent\textbf{Passo 4: Passaggio al limite sul contorno $k \to \infty$ e covarianza per traslazione.}
+Siano $\zeta = (1+i\tau)/k$, $\zeta_0 = 1/k$, e suddividiamo $\tau \in \R$ alle soglie $M \ge 16$ e $\delta_0 k$
+con $\delta_0 \in (0, e^{-3})$ abbastanza piccolo.
+
+\emph{Regione 1 ($|\tau| \le M$):} Per~\eqref{eq:Wg-exp}, uniformemente su $|\tau| \le M$,
+$k\log\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)} = i\tau(c_1(g^*)-L) + (1+i\tau)\log(1+i\tau) + o_M(1)$,
+sicché moltiplicando per $e^{i\sigma\tau} = e^{i(L+\alpha)\tau}$ si ha
+\[
+e^{i\sigma\tau}\left(\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right)^{\!k}
+= e^{-(\gamma+\alpha')} e^{\Phi_{\alpha'}(1+i\tau)}\bigl(1 + o_M(1)\bigr),
+\qquad \alpha' := \alpha + c_1(g^*) - \gamma.
+\]
+
+\emph{Regione 2 ($M < |\tau| \le \delta_0 k$):} Scegliamo $M \ge 16$ in modo che $\arctan M > 5/4$ e
+$\log(2t) \le \frac{1}{4} t$ ($t \ge M$). Scriviamo $\zeta = \rho e^{i\theta}$ ($\rho = \sqrt{1+\tau^2}/k \le 2\delta_0$,
+$\theta = \arctan\tau$), $W_{g^*}(\zeta) = 1 + X + i Y$, e $W_{g^*}(\zeta_0) = 1 + X_0$, dove
+$X := \frac{\log\rho - \tau\theta + c_1(g^*)}{k} + \re r_g(\zeta)$,
+$X_0 := \frac{-L + c_1(g^*)}{k} + r_g(\zeta_0)$, e
+$Y := \frac{\tau\log\rho + \theta + c_1(g^*)\tau}{k} + \im r_g(\zeta)$.
+Posto $\varepsilon(\delta_0) := \sup_{0 < |\zeta| \le 2\delta_0,\, \re\zeta > 0} |r_g(\zeta)|/|\zeta| \to 0^+$,
+poiché $\log\rho + L \le \frac{1}{4}|\tau|$, $\tau\theta \ge \frac{5}{4}|\tau|$, e
+$|r_g(\zeta)| + |r_g(\zeta_0)| \le 3\varepsilon(\delta_0)|\tau|/k$, prendendo $\delta_0$ così piccolo che
+$\varepsilon(\delta_0) < 1/12$ si ottiene $X - X_0 \le -\frac{3|\tau|}{4k}$. Restringendo eventualmente
+$\delta_0 > 0$ affinché $\sup_{0 < |\zeta| \le 2\delta_0,\, \re\zeta > 0} |W_{g^*}(\zeta) - 1| < 1/8$ (per convergenza dominata, essendo $m_0(g^*) = 1$),
+e prendendo $k$ abbastanza grande affinché $|X_0| < 1/8$ e $|\zeta| \le \sqrt{2}\delta_0$, si ha
+$|X|+|X_0| < 1/4$ (quindi $2+X+X_0 > 7/4 > 4/3$) e dunque $(1+X)^2 - (1+X_0)^2 = (2+X+X_0)(X-X_0) \le -\frac{|\tau|}{k}$. Inoltre, posti
+$u := |\tau|/k \in (0,\delta_0]$ e $C_2 := |c_1(g^*)| + \frac{\pi}{2} + 1$,
+$|Y| \le \frac{2|\tau|\log(1/u) + C_2|\tau|}{k}$ implica
+$Y^2 \le \frac{|\tau|}{k}\bigl(8 u\log^2(1/u) + 2 C_2^2 u\bigr) < \frac{|\tau|}{4k}$
+scegliendo $\delta_0 \in (0, e^{-3})$ tale che $8\delta_0\log^2(1/\delta_0) + 2 C_2^2\delta_0 < 1/4$
+(poiché $u \mapsto u\log^2(1/u)$ è crescente su $(0, e^{-2})$). Dato $0 < W_{g^*}(\zeta_0) < 1$,
+\[
+\left|\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right|^2
+= \frac{(1+X)^2 + Y^2}{(1+X_0)^2} \le 1 - \frac{3|\tau|}{4k W_{g^*}(\zeta_0)^2} \le e^{-|\tau|/(2k)},
+\]
+da cui $\bigl|W_{g^*}(\zeta)/W_{g^*}(\zeta_0)\bigr|^{k-1} \le e^{-(k-1)|\tau|/(4k)} \le e^{-|\tau|/8}$.
+
+\emph{Regione 3 ($|\tau| > \delta_0 k$):} Per $\omega = \tau/k$ ($|\omega| > \delta_0$), il lemma di
+Riemann--Lebesgue garantisce che $\widehat{(g^*)^2}(\omega) = \int_0^\infty g^*(u)^2 e^{-i\omega u}\dd u$
+è continua, tende a $0$ per $|\omega| \to \infty$ e verifica $|\widehat{(g^*)^2}(\omega)| < 1$ per ogni
+$\omega \neq 0$ (l'uguaglianza costringerebbe $e^{-i\omega u}$ a essere costante q.o.\ su $\{g^* \neq 0\}$,
+che ha misura positiva mentre gli insiemi di livello di $e^{-i\omega u}$ sono laterali discreti di
+$\frac{2\pi}{|\omega|}\mathbb{Z}$). Dunque $\theta_1 := \sup_{|\omega| \ge \delta_0}|\widehat{(g^*)^2}(\omega)| < 1$.
+Poiché $W_{g^*}(1/k+i\omega) \to \widehat{(g^*)^2}(\omega)$ uniformemente per convergenza dominata e
+$W_{g^*}(1/k) \to 1$, esiste $\theta_0 \in (\theta_1, 1)$ con $|W_{g^*}(\zeta)/W_{g^*}(\zeta_0)| \le \theta_0$
+per $k$ grande e $|\tau| > \delta_0 k$. Per Plancherel, $\int_{-\infty}^\infty |W_{g^*}(1/k+i\omega)|^2\dd\omega \le 2\pi\|g^*\|_{L^4}^4$.
+Poiché gli integrandi interni al quadrato sono non negativi, $|K_Q(\sigma z)| \le K_Q(\sigma) \ll e^\sigma/\sigma$
+e $\sigma^3 k^2 |V_{Q,g^*}(\sigma z)| \le \sigma^3 k^2 V_{Q,g^*}(\sigma) \ll L^2$; quindi la Regione~3 contribuisce
+al più per $O_{\widetilde{Q},g}(k)\,\theta_0^{k-3}$ agli integrali normalizzati
+$I(F_{g^*})/\bigl(e^\sigma W_{g^*}(1/k)^k (a')^{-k}\bigr)$ e $\sigma W_{g^*}(1/k)\, k J(F_{g^*})/\bigl(L^2 e^\sigma W_{g^*}(1/k)^k (a')^{-k}\bigr)$.
+
+Per passare rigorosamente al limite nel numeratore riscalato per $L^2$, manteniamo il fattore sul
+contorno non espanso fino a dopo la divisione: per $k \ge 4$, definiamo
+\[
+A_k := \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau}\!\left(\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right)^{\!k} N_0(\tau)\dd\tau,
+\quad
+A_k' := \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau}\!\left(\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right)^{\!k-1} N_0(\tau)\dd\tau,
+\]
+e $B_k := \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau}(W_{g^*}(\zeta)/W_{g^*}(\zeta_0))^{k-1}(N_1(\tau) + \beta_* N_0(\tau))\dd\tau$.
+Per~\eqref{eq:Phi-abs}, il decadimento $e^{-|\tau|/8}$ in Regione~2, il termine $O(k\theta_0^{k-3})$ in
+Regione~3 e la Regione~1 su $|\tau| \le M(\varepsilon)$ ($M(\varepsilon) \to \infty$ per $\varepsilon \to 0^+$),
+per $k \to \infty$ si ottiene
+\[
+A_k \to e^{-(\gamma+\alpha')}\mathcal{I}_\infty(\alpha'),
+\qquad
+B_k \to e^{-(\gamma+\alpha')}\bigl(\mathcal{M}_\infty(\alpha') + \beta_*\mathcal{I}_\infty(\alpha')\bigr),
+\]
+dove $\mathcal{I}_\infty(\alpha') := \int_0^\infty \widetilde{Q}(x)^2 \nu_{\alpha'}(x)\dd x > 0$ (Lemma~\ref{lem:nu-pos})
+e $\mathcal{M}_\infty(\alpha') := \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_{\alpha'}(1+i\tau)} N_1(\tau)\dd\tau$.
+In particolare $A_k$ è limitato lontano da $0$ per $k$ grande. Inoltre su $|\tau| \le \delta_0 k$,
+\eqref{eq:Wg-exp} fornisce $|1 - W_{g^*}(\zeta)/W_{g^*}(\zeta_0)| \ll_g \frac{L(1+|\tau|)}{k}$; integrando contro
+$|W_{g^*}(\zeta)/W_{g^*}(\zeta_0)|^{k-1}|N_0(\tau)|$ su $|\tau| \le 16$, $16 < |\tau| \le \delta_0 k$ (ponendo $M = 16$ nella Regione~2) e $|\tau| > \delta_0 k$
+segue $|A_k' - A_k| \ll_{\widetilde{Q},g} L/k$.
+
+Inserendo $\sigma e^{-\sigma z} K_Q(\sigma z) = N_0(\tau) + O(L^{2d}/k)$ (Lemma~\ref{lem:uniform-W-V}(iii))
+e~\eqref{eq:Vg-exp} negli integrali di Bromwich (usando $\int_{-\infty}^\infty |W_{g^*}(\zeta)/W_{g^*}(\zeta_0)|^{k-1}\dd\tau \ll_g 1$)
+si ottiene
+\begin{align*}
+I(F_{g^*}) &= e^\sigma W_{g^*}(1/k)^k (a')^{-k} \bigl(A_k + O(L^{2d}/k)\bigr), \\
+k J(F_{g^*}) &= \frac{e^\sigma}{\sigma W_{g^*}(1/k)} W_{g^*}(1/k)^k (a')^{-k} \bigl(L^2 A_k + 2L B_k + o(L)\bigr),
+\end{align*}
+poiché $L^2 A_k' = L^2 A_k + O(L^3/k)$. Usando $(A_k + O(L^{2d}/k))^{-1} = A_k^{-1}(1 + O(L^{2d}/k))$ e
+$W_{g^*}(1/k) = 1 + O_g(L/k)$, dividendo si ricava
+\[
+R_k(F_{g^*}) = \frac{L^2}{\sigma} + \frac{2 B_k}{A_k} + o(1)
+= \log k + \bigl(2\beta_* + c_1(g^*) - \gamma\bigr) + \eta(h; \alpha', \widetilde{Q}) + o(1),
+\]
+con $\alpha' := \alpha + c_1(g^*) - \gamma$ e $\eta(h; \alpha', \widetilde{Q}) = -\alpha' + 2\mathcal{M}_\infty(\alpha')/\mathcal{I}_\infty(\alpha')$.
+Questo dimostra l'esistenza finita del limite e l'identità di covarianza puntuale con
+$\kappa(g^*) - \gamma := 2\beta_* + c_1(g^*) - \gamma$. Inoltre, per la stima superiore di
+Polymath8b~\eqref{eq:pm8b-barrier} (\cite[Corollario~37]{PM8b}), $R_k(F_h) \le M_k \le \frac{k}{k-1}\log k$,
+quindi $\eta(h; \alpha', \widetilde{Q}) \le 0$ per ogni $\alpha' \in \R$; pertanto
+$\sup_{\alpha' \in \R} \eta(h; \alpha', \widetilde{Q}) \in [\eta(h; 0, \widetilde{Q}), 0]$ è finito e,
+poiché $\alpha \mapsto \alpha'$ è una bigezione di $\R$, passando al $\sup_{\alpha \in \R}$ si
+ottiene~\eqref{eq:shift-covariance}.
+
+\smallskip
+\noindent\textbf{Passo 5: Completamento algebrico.}
+Sfruttando $(1+u)h(u) = 1$ ($u \ge 0$) e $\int_0^\infty (g^*(u)^2 - h(u)^2)\dd u = 0$,
+\begin{align*}
+-\int_0^\infty (1+u)\bigl(g^*(u) - h(u)\bigr)^2 \dd u
+&= -\int_0^\infty u\bigl(g^*(u)^2 - h(u)^2\bigr)\dd u + 2\int_0^\infty \bigl(g^*(u) - h(u)\bigr)\dd u \\
+&= \bigl(c_1(g^*) - \gamma\bigr) + 2\beta_* = \kappa(g^*) - \gamma \le 0.
+\end{align*}
+Poiché $1+u \ge 1 > 0$, l'uguaglianza vale se e solo se $g^*(u) = h(u)$ q.o.\ su $(0,\infty)$,
+ossia $g(u) = C/(1+\theta u)$ q.o.\ con $C = m_0(g)/c$ e $\theta = m_0(g)/c^2 > 0$.
+\end{proof}
+
+\begin{remark}[Scelta della scala, stabilità e portata del risultato]
+Riscalando $a' = \mu k\sigma$ ($\mu > 0$) in~\eqref{eq:Wg-exp}, si ha
+$k\log\bigl(W_{g^*}(\sigma(1+i\tau)/a')/W_{g^*}(\sigma/a')\bigr) = -\frac{i\tau}{\mu}\log k + O(1)$,
+che cancella $e^{i\sigma\tau}$ esattamente quando $\mu = 1$. La stabilità quantitativa discende
+immediatamente da~\eqref{eq:shift-covariance}--\eqref{eq:kappa-penalty}: ogni nucleo $g$ che si avvicina
+a meno di $\varepsilon > 0$ al limite radiale traslato ottimo soddisfa
+$\|g^* - h\|_{L^2((1+u)\dd u)} \le \sqrt{\varepsilon}$. Il Teorema~\ref{thm:uniqueness} si applica
+strettamente a nuclei prodotto~\eqref{eq:Fg-def} con polinomi radiali; il Teorema~\ref{thm:main}
+supera tale barriera radiale attraverso l'ansatz non radiale nelle somme di potenze~\eqref{eq:ansatz-C}.
+\end{remark}
+
+\section{Riduzione esatta di Laplace a \texorpdfstring{$k$}{k} finito per la famiglia \texorpdfstring{$\Lambda_W$}{Lambda\_W}}\label{sec:laplace}
+
+Sia $\Lambda_W$ ($W \ge 0$) l'insieme di tutte le partizioni $\lambda = (\lambda_1,\dots,\lambda_{\ell(\lambda)})$
+con $\lambda_1 \ge \cdots \ge \lambda_{\ell(\lambda)} \ge 2$ e $|\lambda| \le W$ (inclusa $()$); si noti che
+$\ell(\lambda) \le \lfloor W/2 \rfloor$ ($\le 4$ per $W=9$). Dati $a, \sigma > 0$ e polinomi
+$Q_\lambda(y) := \widetilde{Q}_\lambda(\sigma y)$, poniamo $g(t) := (1+at)^{-1}$, $w(t) := g(t)^2$, e
+\begin{equation}\label{eq:F-LambdaW}
+F(t_1,\dots,t_k) := \left[\sum_{\lambda \in \Lambda_W} Q_\lambda(1 - P_1)
+\prod_{j=1}^{\ell(\lambda)} \bigl(\sigma^{\lambda_j} P_{\lambda_j}\bigr)\right]
+\prod_{i=1}^k g(t_i).
+\end{equation}
+Per $\re s > 0$ e interi $m \ge 0$, definiamo
+\begin{equation}\label{eq:Wm-E-def}
+W_m(s; a) := \int_0^\infty \frac{t^m e^{-st}}{(1+at)^2}\dd t,
+\qquad
+E(s; a) := \int_0^\infty \frac{e^{-st}}{1+at}\dd t.
+\end{equation}
+
+\begin{lemma}[Decomposizione in fratti semplici e decadimento di $W_m$]\label{lem:Wm-pf}
+Siano $a > 0$ e $\re s > 0$.
+\begin{enumerate}
+\item[(i)] $W_0(s;a) = \frac{1}{a} - \frac{s}{a} E(s;a)$, e per ogni intero $m \ge 2$,
+\begin{equation}\label{eq:Wm-pf}
+W_m(s;a) = \frac{1}{a^m}\left(\sum_{r=0}^{m-2} (-1)^{m-r}(m-1-r)\frac{r!\,a^r}{s^{r+1}}
+- (-1)^m m\, E(s;a) + (-1)^m W_0(s;a)\right).
+\end{equation}
+\item[(ii)] Per ogni $m \ge 0$ e $\sigma > 0$ fissato, $|W_m(\sigma + i\omega; a)| \ll_{m,a,\sigma} (1 + |\omega|)^{-1}$
+uniformemente in $\omega \in \R$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}[Dimostrazione]
+Un'integrazione per parti fornisce $W_0(s;a) = \frac{1}{a} - \frac{s}{a} E(s;a)$. Per $m \ge 2$, ponendo $x = a t$
+nell'identità polinomiale esatta
+\[
+x^m = (1+x)^2 \sum_{r=0}^{m-2} (-1)^{m-r}(m-1-r) x^r - (-1)^m m(1+x) + (-1)^m
+\]
+(verificata confrontando i coefficienti di $x^j$ per $0 \le j \le m$) e dividendo per $(1+x)^2$ contro
+$a^{-m-1} e^{-(s/a)x}\dd x$ si ottiene~\eqref{eq:Wm-pf}, grazie a $\int_0^\infty x^r e^{-(s/a)x}\dd x = r!(a/s)^{r+1}$.
+La parte~(ii) segue integrando per parti una volta la~\eqref{eq:Wm-E-def} contro $e^{-i\omega t}$, poiché
+$t \mapsto t^m (1+at)^{-2} e^{-\sigma t} \in C^1[0,\infty) \cap L^1(0,\infty)$ ha derivata integrabile e
+limite nullo a $\infty$.
+\end{proof}
+
+Per ogni tupla $\xi = (\xi_1,\dots,\xi_n)$ di parti $\ge 2$, sia $\Pi([n])$ l'insieme delle partizioni
+$\pi$ dell'insieme $[n] := \{1,\dots,n\}$ ($\Pi(\emptyset) = \{\emptyset\}$), poniamo
+$s_\xi(B) := \sum_{j \in B} \xi_j$ per ogni blocco $B \in \pi$, $(k)_t := k(k-1)\cdots(k-t+1)$ ($(k)_0 := 1$),
+e definiamo
+\begin{equation}\label{eq:Gk-def}
+\cG_k(s; \xi) := \sum_{\substack{\pi \in \Pi([\ell(\xi)]) \\ |\pi| \le k}} (k)_{|\pi|}\,
+W_0(s; a)^{k - |\pi|} \prod_{B \in \pi} W_{s_\xi(B)}(s; a)
+\end{equation}
+(ove si escludono i termini con $|\pi| > k$, che si annullano tramite $(k)_{|\pi|} = 0$, evitando
+potenze negative formali di $W_0$ quando $k < \ell(\xi)$).
+Per $\lambda \in \Lambda_W$ e $S \subseteq [\ell(\lambda)]$, scriviamo $s_\lambda(S) := \sum_{j \in S} \lambda_j$,
+e indichiamo con $\lambda_{\setminus S} \in \Lambda_W$ la partizione ottenuta rimuovendo gli indici in $S$.
+
+\begin{proposition}[Formule esatte di Laplace a $k$ finito per partizioni d'insieme]\label{prop:exact-laplace}
+Fissiamo $W \ge 0$, $k \ge 3$, $a, \sigma > 0$, e i polinomi $\{Q_\lambda\}_{\lambda \in \Lambda_W}$.
+Definiamo $K_{\lambda_1,\lambda_2}(s) := \int_0^1 Q_{\lambda_1}(1-X) Q_{\lambda_2}(1-X) e^{sX}\dd X$ e
+\begin{equation}\label{eq:v-eff-def}
+v_\mu^{\mathrm{eff}}(y) := \int_0^y \frac{Q_\mu(y-t)}{1+at}\dd t
++ \sum_{\lambda \in \Lambda_W}\sum_{\substack{\emptyset \neq S \subseteq [\ell(\lambda)] \\ \lambda_{\setminus S} = \mu}}
+\sigma^{s_\lambda(S)} \int_0^y \frac{Q_\lambda(y-t)\, t^{s_\lambda(S)}}{1+at}\dd t,
+\end{equation}
+con $V_{\mu_1,\mu_2}^{\mathrm{eff}}(s) := \int_0^\infty v_{\mu_1}^{\mathrm{eff}}(y) v_{\mu_2}^{\mathrm{eff}}(y) e^{-sy}\dd y$.
+Allora
+\begin{align}
+I(F) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty}
+\sum_{\lambda_1,\lambda_2 \in \Lambda_W} K_{\lambda_1,\lambda_2}(s)\,
+\sigma^{|\lambda_1|+|\lambda_2|} \, \cG_k(s; \lambda_1 \sqcup \lambda_2)\dd s,
+\label{eq:I-exact-laplace}\\
+J(F) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty}
+e^s \sum_{\mu_1,\mu_2 \in \Lambda_W} V_{\mu_1,\mu_2}^{\mathrm{eff}}(s)\,
+\sigma^{|\mu_1|+|\mu_2|} \, \cG_{k-1}(s; \mu_1 \sqcup \mu_2)\dd s,
+\label{eq:J-exact-laplace}
+\end{align}
+dove $\lambda_1 \sqcup \lambda_2$ indica la concatenazione ed entrambi gli integrali verticali convergono assolutamente.
+\end{proposition}
+
+\begin{proof}[Dimostrazione]
+Sviluppando $\prod_{j=1}^n P_{\xi_j}(t) = \sum_{i_1,\dots,i_n \in [k]} \prod_{j=1}^n t_{i_j}^{\xi_j}$
+secondo la partizione di uguaglianza $\pi \in \Pi([n])$ degli indici $(i_1,\dots,i_n)$, vi sono esattamente
+$(k)_{|\pi|}$ assegnazioni iniettive dei $|\pi|$ blocchi in $[k]$ (nulle per $|\pi| > k$).
+Moltiplicando per $\prod_{i=1}^k w(t_i) e^{-s t_i}$ e integrando su $[0,\infty)^k$ si riconosce $\cG_k(s; \xi)$
+come trasformata di Laplace dell'integrale sull'iperpiano
+\[
+\Psi_k(X; \xi) := \int_{\substack{t_1,\dots,t_k \ge 0 \\ t_1+\cdots+t_k = X}}
+\left(\prod_{j=1}^n P_{\xi_j}(t)\right) \prod_{i=1}^k w(t_i)\dd m_{k-1},
+\]
+dove $\dd m_{k-1}$ denota la misura di Lebesgue $(k-1)$-dimensionale sull'iperpiano
+$\sum_{i=1}^k t_i = X$ normalizzata da $\dd X \dd m_{k-1} = \dd t_1\cdots\dd t_k$
+(ossia $\dd m_{k-1} = \dd t_1\cdots\dd t_{k-1}$ con $t_k = X - \sum_{i=1}^{k-1} t_i$).
+Per il Lemma~\ref{lem:Wm-pf}(ii), ogni termine non nullo ($|\pi| \le k$) in~\eqref{eq:Gk-def} è
+prodotto di $k \ge 3$ fattori $W_m$, quindi è $O((1+|\omega|)^{-k}) \in L^1(\R_\omega)$. Poiché $\Psi_k(X;\xi) = 0$
+per $X < 0$ e l'integrale di inversione è continuo su $\R$ (sicché $\Psi_k(0;\xi) = 0$), l'inversione di
+Fourier/Laplace fornisce $\Psi_k(X;\xi) = \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty} e^{sX}\cG_k(s;\xi)\dd s$
+per ogni $X \in \R$. Integrando contro $Q_{\lambda_1}(1-X) Q_{\lambda_2}(1-X)$ su $X \in [0,1]$ e applicando
+Fubini si ottiene~\eqref{eq:I-exact-laplace}.
+
+Per $J(F)$, posti $X := \sum_{i=1}^{k-1} t_i$, $y := 1 - X$ e $P_r' := \sum_{i=1}^{k-1} t_i^r$
+($P_r = P_r' + t_k^r$), lo sviluppo binomiale di $\prod_{j=1}^{\ell(\lambda)} (P_{\lambda_j}' + t_k^{\lambda_j})$
+sui sottoinsiemi $S \subseteq [\ell(\lambda)]$ raccoglie l'integrale interno in $t_k$ nella forma
+$v(t_1,\dots,t_{k-1}) = \sum_{\mu \in \Lambda_W} \bigl(\prod_{r=1}^{\ell(\mu)} \sigma^{\mu_r} P_{\mu_r}'\bigr) v_\mu^{\mathrm{eff}}(y)$.
+Elevando al quadrato e integrando sull'iperpiano $t_1 + \cdots + t_{k-1} = X \in [0,1]$ segue
+$J(F) = \int_0^1 \sum_{\mu_1,\mu_2} v_{\mu_1}^{\mathrm{eff}}(1-X) v_{\mu_2}^{\mathrm{eff}}(1-X)
+\sigma^{|\mu_1|+|\mu_2|} \Psi_{k-1}(X; \mu_1\sqcup\mu_2)\dd X$.
+Poiché $v_\mu^{\mathrm{eff}}(y)$ ha crescita polinomiale e si annulla in $0$, si ha
+$V_{\mu_1,\mu_2}^{\mathrm{eff}}(\sigma+i\omega) \ll (1+|\omega|)^{-1}$, mentre per $k - 1 \ge 2$ vale
+$|\cG_{k-1}(\sigma+i\omega;\xi)| \ll (1+|\omega|)^{-(k-1)} \le (1+|\omega|)^{-2}$ (in $L^1(\R_\omega)$,
+cosicché il prodotto appartiene a $L^1(\R_\omega)$).
+Essendo $\Psi_{k-1}(1-y;\xi) = 0$ per $y > 1$, la sostituzione $X = 1-y$ estende $\int_0^1$ a $\int_0^\infty$,
+e il teorema di Fubini conclude la dimostrazione di~\eqref{eq:J-exact-laplace}.
+\end{proof}
+
+\section{Dimostrazione del limite asintotico (\texorpdfstring{$k \to \infty$}{k -> infinito})}\label{sec:asymptotic}
+
+Specializziamo la Proposizione~\ref{prop:exact-laplace} a $\alpha \in \R$, $L = \log k$, $\sigma = L+\alpha$,
+$a = k\sigma$ (con $k \ge \max(20, 2\lfloor W/2\rfloor + 2)$ e $\sigma > 0$), polinomi fissati
+$\{\widetilde{Q}_\lambda\}_{\lambda\in\Lambda_W}$ di gradi $d_\lambda$, e contorno $s = \sigma z$
+($z = 1+i\tau$, $\zeta = s/a = (1+i\tau)/k$, $\zeta_0 = 1/k$).
+
+\begin{lemma}[Proprietà autocontenute di $W_0$]\label{lem:W0-props}
+Siano fissati $a, \sigma > 0$.
+\begin{enumerate}
+\item[(i)] $W_0(z; a) = a^{-1} W_0(z/a; 1)$ per $\re z > 0$, e $W_0(\zeta; 1) = 1 - \zeta e^\zeta E_1(\zeta)$
+dove $E_1(\zeta) := \int_\zeta^\infty t^{-1} e^{-t}\dd t$.
+\item[(ii)] $\omega \mapsto |W_0(\sigma + i\omega; a)|$ è pari e strettamente decrescente su $[0,\infty)$ (cfr.\ \cite[Lemma~5]{Lewulis}).
+\item[(iii)] Se $0 < \zeta_0 := \re\zeta \le 1/20$, allora $|W_0(\zeta;1)/W_0(\zeta_0;1)| \le \frac{5}{2|\zeta|}$ (cfr.\ \cite[Lemma~6]{Lewulis}).
+\item[(iv)] Per $|\tau| \le T := 100 L$ e $k$ sufficientemente grande, $W_0(1/k;1) = 1 + O(L/k)$ e
+\begin{equation}\label{eq:W0-log-exp}
+k \log\frac{W_0(\zeta;1)}{W_0(\zeta_0;1)} = i\tau(\gamma - L) + (1+i\tau)\log(1+i\tau) + \Delta_k(\tau),
+\qquad |\Delta_k(\tau)| \ll \frac{L^2(1+\tau^2)}{k}.
+\end{equation}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}[Dimostrazione]
+La~(i) segue da $u = a t$, integrazione per parti e $w = \zeta(1+t)$.
+Per la~(ii), la parità segue per coniugazione. Scrivendo $s = \sigma + i\omega$ e ruotando per il
+teorema di Cauchy il cammino da $t \in [0,\infty)$ alla semiretta $u = s t$ (giustificato dal decadimento
+integrabile dell'integrando nel settore chiuso tra $[0,\infty)$ e $\R_{\ge 0}\cdot s \subset \{\re z > 0\}$,
+cfr.\ il Lemma~\ref{lem:Wm-pf}(i)), si ottiene $W_0(s;a) = \int_0^\infty \frac{u e^{-u}}{r_u + i\omega}\dd u$
+($r_u := \sigma + a u > 0$; in particolare $\re W_0 > 0$). Simmetrizzando su $(u,v) \in (0,\infty)^2$
+si elidono i termini $\pm i\omega(r_u - r_v)$:
+\[
+|W_0(\sigma+i\omega; a)|^2
+= \int_0^\infty\!\!\int_0^\infty \frac{u v e^{-u-v}}{r_u + r_v}
+\left(\frac{r_u}{r_u^2+\omega^2} + \frac{r_v}{r_v^2+\omega^2}\right)\dd u\dd v,
+\]
+la cui derivata rispetto a $\omega > 0$ è strettamente negativa.
+
+Per la~(iii), integrando per parti in senso opposto si ha
+$W_0(\zeta;1) = \frac{1}{\zeta} - \frac{2}{\zeta}\int_0^\infty \frac{e^{-\zeta t}}{(1+t)^3}\dd t$, da cui
+$|W_0(\zeta;1)| \le \frac{2}{|\zeta|}$. Su $\zeta_0 \in (0, 1/20]$, vale
+$E_1(\zeta_0) \le \log(\zeta_0^{-1}) + e^{-1}$, e $\zeta_0 \mapsto \zeta_0 e^{\zeta_0}(\log(\zeta_0^{-1})+e^{-1})$
+è strettamente crescente su $(0, 1/20]$ (avendo derivata $e^{\zeta_0}((1+\zeta_0)(\log(\zeta_0^{-1})+e^{-1}) - 1) > 0$),
+per cui $W_0(\zeta_0;1) \ge 1 - \frac{1}{20}e^{1/20}(\log 20 + e^{-1}) > 4/5$, da cui la tesi.
+
+Per la~(iv), $E_1(\zeta) = -\gamma - \log\zeta - \sum_{n\ge 1} \frac{(-\zeta)^n}{n\cdot n!}$ implica
+$\log W_0(\zeta;1) = \zeta(\gamma + \log\zeta) + O(|\zeta|^2(1+|\log\zeta|)^2)$ per $|\zeta| \le c_0$,
+fissata una piccola costante assoluta $c_0 \in (0, 1/2]$ tale che $|W_0(\zeta;1) - 1| \le 1/2$ su $|\zeta| \le c_0$ (così $\log W_0$ è univalente).
+Valutando in $\zeta = (1+i\tau)/k$ ($|\tau| \le T$) e sottraendo $\zeta_0 = 1/k$ si ottiene~\eqref{eq:W0-log-exp}.
+\end{proof}
+
+\begin{lemma}[Stime uniformi per momenti e integrali interni]\label{lem:uniform-W-V}
+Siano $\sigma = L + \alpha$, $a = k\sigma$, e $z = 1+i\tau$ ($\tau \in \R$).
+\begin{enumerate}
+\item[(i)] Per ogni intero $m \ge 2$ e uniformemente su tutto $\tau \in \R$,
+\begin{equation}\label{eq:Wm-uniform}
+k \sigma^m \frac{W_m(\sigma z; k\sigma)}{W_0(\sigma; k\sigma)} = \frac{(m-2)!}{z^{m-1}} + O_m\!\left(\frac{L}{k}\right).
+\end{equation}
+\item[(ii)] Definiamo $(\cH\widetilde{Q})(x) := -\int_0^x \frac{\widetilde{Q}(x-u)-\widetilde{Q}(x)}{u}\dd u$,
+$(B_{s-1}\widetilde{Q})(x) := \int_0^x \widetilde{Q}(x-u) u^{s-1}\dd u$ ($s \ge 2$), e
+\[
+G_\mu(x) := \widetilde{Q}_\mu(x)\log x - (\cH\widetilde{Q}_\mu)(x)
++ \sum_{\lambda\in\Lambda_W}\sum_{\substack{\emptyset\neq S\subseteq[\ell(\lambda)] \\ \lambda_{\setminus S}=\mu}}
+\bigl(B_{s_\lambda(S)-1}\widetilde{Q}_\lambda\bigr)(x).
+\]
+Allora uniformemente su tutto $\tau \in \R$,
+\begin{equation}\label{eq:V-uniform}
+\sigma^3 k^2 V_{\mu_1,\mu_2}^{\mathrm{eff}}(\sigma z; k\sigma)
+= L^2 N_{\mu_1,\mu_2}^{(0)}(\tau)
++ L\bigl(N_{\mu_1,\mu_2}^{(1)}(\tau) + N_{\mu_2,\mu_1}^{(1)}(\tau)\bigr)
++ N_{\mu_1,\mu_2}^{(2)}(\tau) + O\!\left(\frac{L^2}{k}\right),
+\end{equation}
+dove $N_{\mu_1,\mu_2}^{(0)}(\tau) := \int_0^\infty \widetilde{Q}_{\mu_1}\widetilde{Q}_{\mu_2} e^{-zx}\dd x$,
+$N_{\mu_1,\mu_2}^{(1)}(\tau) := \int_0^\infty \widetilde{Q}_{\mu_1} G_{\mu_2} e^{-zx}\dd x$, e
+$N_{\mu_1,\mu_2}^{(2)}(\tau) := \int_0^\infty G_{\mu_1} G_{\mu_2} e^{-zx}\dd x$ sono uniformemente $O(1)$ per $\tau \in \R$.
+\item[(iii)] Uniformemente su $\tau \in \R$, $\sigma e^{-\sigma z} K_{\lambda_1,\lambda_2}(\sigma z)
+= N_{\lambda_1,\lambda_2}^{(0)}(\tau) + O(L^{d_{\lambda_1}+d_{\lambda_2}}/k)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}[Dimostrazione]
+Per la~(i), ponendo $w = \sigma t$ il rapporto si scrive come
+$\frac{1}{W_0(1/k;1)}\int_0^\infty \frac{k^2 w^m}{(1+kw)^2} e^{-zw}\dd w$.
+Poiché $0 \le w^{m-2} - \frac{k^2 w^m}{(1+kw)^2} = w^{m-2}\frac{2kw+1}{(1+kw)^2}$ e $|e^{-zw}| = e^{-w}$,
+spezzando in $w=1$ per $m=2$ la differenza rispetto a $\int_0^\infty w^{m-2}e^{-zw}\dd w = \frac{(m-2)!}{z^{m-1}}$
+è $O(L/k)$, mentre per $m \ge 3$ la stima $w\frac{2kw+1}{(1+kw)^2} \le \frac{2}{k}$ fornisce $O_m(1/k)$.
+Dividendo per $W_0(1/k;1) = 1 + O(L/k)$ segue~\eqref{eq:Wm-uniform}.
+
+Per la~(ii), ponendo $x = \sigma y$ e $u = \sigma t$ in~\eqref{eq:v-eff-def} e sviluppando $\widetilde{Q}_\mu(x-u)$
+mediante $\int_0^x \frac{\dd u}{u+1/k} = L + \log x + \log(1 + \frac{1}{kx})$ e
+$\int_0^x \frac{u^j\dd u}{u+1/k} = \frac{x^j}{j} - \frac{1}{k}\int_0^x \frac{u^{j-1}\dd u}{u+1/k}$, otteniamo
+$\sigma k v_\mu^{\mathrm{eff}}(x/\sigma) = L \widetilde{Q}_\mu(x) + G_\mu(x) + E_{k,\mu}(x)$, dove $E_{k,\mu}$
+raccoglie $R_{1,k}^{\mu,(0)}(x) := \widetilde{Q}_\mu(x)\log(1 + \frac{1}{kx})$,
+$R_{1,k}^{\mu,(1)}(x) := -\sum_{j=1}^{d_\mu} \frac{(-1)^j \widetilde{Q}_\mu^{(j)}(x)}{j!\, k}\int_0^x \frac{u^{j-1}\dd u}{u+1/k}$,
+e i resti di traslazione $R_{2,k}^{\lambda,S}$ maggiorati in modulo da
+$\frac{1}{k}\int_0^x |\widetilde{Q}_\lambda(x-u)|u^{s-2}\dd u \ll (1+x^{d_\lambda+s-1})/k$.
+Sia $d_{\max} := \max_\lambda (d_\lambda + |\lambda|)$.
+Poiché $\int_0^x \frac{\dd u}{u+1/k} = \log(1+kx)$ e $\frac{u^{j-1}}{u+1/k} \le u^{j-2}$ per $j \ge 2$,
+si ha anche $|R_{1,k}^{\mu,(1)}(x)| \ll_\mu (1+x^{d_{\max}})\log(2+kx)/k$, la cui norma in $L^1(e^{-x}\dd x)$
+e in $L^2(e^{-x}\dd x)$ è $O(L/k)$.
+Spezzando $(0,\infty)$ in $1/k$ e $1$, la sostituzione
+$v = kx$ su $(0, 1/k]$ dà $\int_0^{1/k} (1+x^{d_{\max}})\log^r(1+\frac{1}{kx})e^{-x}\dd x \ll 1/k$ ($r = 1,2$),
+mentre $\log(1+\frac{1}{kx}) \le \frac{1}{kx}$ su $(1/k,\infty)$ fornisce
+$\int_{1/k}^\infty (1+x^{d_{\max}})\log^r(1+\frac{1}{kx})e^{-x}\dd x \ll L/k$ ($r = 1$) e $O(1/k)$ ($r = 2$),
+da cui $\|E_{k,\mu}\|_{L^1(e^{-x}\dd x)} \ll L/k$ e $\|E_{k,\mu}\|_{L^2(e^{-x}\dd x)} \ll k^{-1/2}$.
+Per i termini misti con $A_{k,\mu} := L\widetilde{Q}_\mu + G_\mu$ (essendo
+$|A_{k,\mu}(x)| \ll (1+x^{d_{\max}})(L + |\log x|)$), integrando su $(0, 1/k] \cup (1/k, 1] \cup (1,\infty)$
+ogni contributo risulta $O(L^2/k)$, dimostrando~\eqref{eq:V-uniform}.
+
+Per la~(iii), il cambio $x = \sigma(1-X)$ trasforma $\sigma e^{-\sigma z} K_{\lambda_1,\lambda_2}(\sigma z)$ in
+$N_{\lambda_1,\lambda_2}^{(0)}(\tau) - \int_\sigma^\infty \widetilde{Q}_{\lambda_1}\widetilde{Q}_{\lambda_2} e^{-zx}\dd x$,
+la cui coda è $\ll \sigma^{d_{\lambda_1}+d_{\lambda_2}} e^{-\sigma} \ll L^{d_{\lambda_1}+d_{\lambda_2}}/k$.
+\end{proof}
+
+Per ogni tupla $\xi = (\xi_1,\dots,\xi_n)$ di parti $\ge 2$, definiamo il peso del processo puntuale
+di Poisson (PPP)
+\begin{equation}\label{eq:WPPP-def}
+W_\xi^{\mathrm{PPP}}(z) := \sum_{\pi \in \Pi([n])} \prod_{B \in \pi}
+\frac{(s_\xi(B)-2)!}{z^{s_\xi(B)-1}} =: \sum_{r \ge 0} w_{\xi, r} z^{-r},
+\end{equation}
+osservando che $w_{(),0} = 1$, $w_{\xi, r} > 0$ se e solo se $|\xi| - n \le r \le |\xi| - 1$ ($n \ge 1$), e
+$|W_\xi^{\mathrm{PPP}}(1+i\tau)| \le W_\xi^{\mathrm{PPP}}(1)$.
+
+\begin{proposition}[Limite asintotico sul contorno]\label{prop:contour-limit}
+Sia $F$ definita da~\eqref{eq:F-LambdaW} con $a = k\sigma$ ($\sigma = L+\alpha$). Poniamo
+\begin{align}
+\mathcal{I}_\infty(\alpha) &:= \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau)}
+\sum_{\lambda_1,\lambda_2 \in \Lambda_W} W_{\lambda_1\sqcup\lambda_2}^{\mathrm{PPP}}(1+i\tau)\, N_{\lambda_1,\lambda_2}^{(0)}(\tau)\dd\tau, \label{eq:I-inf-def}\\
+\mathcal{M}_\infty(\alpha) &:= \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau)}
+\sum_{\mu_1,\mu_2 \in \Lambda_W} W_{\mu_1\sqcup\mu_2}^{\mathrm{PPP}}(1+i\tau)\, N_{\mu_1,\mu_2}^{(1)}(\tau)\dd\tau. \label{eq:M-inf-def}
+\end{align}
+Se $\mathcal{I}_\infty(\alpha) > 0$, allora per $k \to \infty$,
+\begin{equation}\label{eq:quotient-limit}
+R_k(F) = L + \left(\frac{2\mathcal{M}_\infty(\alpha)}{\mathcal{I}_\infty(\alpha)} - \alpha\right) + O\!\left(\frac{1}{L}\right).
+\end{equation}
+\end{proposition}
+
+\begin{proof}[Dimostrazione]
+Scriviamo $I(F) = e^\sigma W_0(\sigma; a)^k Z_{I,k}$ e $J(F) = \frac{e^\sigma W_0(\sigma; a)^{k-1}}{\sigma^2 k^2} Z_{J,k}$
+in~\eqref{eq:I-exact-laplace}--\eqref{eq:J-exact-laplace}, con $s = \sigma z$ ($z = 1+i\tau$) e
+$\widehat{\cG}_n(\sigma z;\xi) := \cG_n(\sigma z;\xi)/W_0(\sigma;a)^n$ ($n \in \{k, k-1\}$). Spezziamo
+$\tau \in \R$ a $T := 100 L$ e $4k$, e poniamo $p_{\max} := 2\lfloor W/2\rfloor$ ($\le 8$ per $W=9$).
+
+Su $|\tau| > T$, $|W_m(\sigma z; a)| \le W_m(\sigma; a)$, $|K_{\lambda_1,\lambda_2}(\sigma z)| \ll e^\sigma/\sigma$,
+$|V_{\mu_1,\mu_2}^{\mathrm{eff}}(\sigma z; a)| \ll L^2/(\sigma^3 k^2)$, e per il Lemma~\ref{lem:uniform-W-V}(i)
+ciascun blocco verifica $k\sigma^{s_\xi(B)}|W_{s_\xi(B)}|/W_0(\sigma;a) \ll 1$. Poiché $(n)_{|\pi|}/k^{|\pi|} \le 1$ e
+$n - |\pi| \ge k - 1 - p_{\max}$ ($\ge k-9$ per $W=9$), le integrande sono maggiorate da
+$O(L^2)|W_0(\sigma z;a)/W_0(\sigma;a)|^{k-1-p_{\max}}$. Per il Lemma~\ref{lem:W0-props}(ii),(iv), su
+$T < |\tau| \le 4k$ ciò è $\ll L^3 e^{-\pi T/2} \ll k^{-150}$ (integrandosi a $O(k^{-148})$), mentre su
+$|\tau| > 4k$ il Lemma~\ref{lem:W0-props}(iii) produce $\ll L^2 k (5/8)^{k-1-p_{\max}}$.
+
+Su $|\tau| \le T$, $W_0(\sigma z;a) \neq 0$, $(n)_{|\pi|}/k^{|\pi|} = 1 + O(1/k)$, e il Lemma~\ref{lem:W0-props}(iv)
+con~\eqref{eq:Wm-uniform} forniscono, per $n \in \{k, k-1\}$,
+\begin{align*}
+\sigma^{|\xi|}\widehat{\cG}_n(\sigma z;\xi)
+&= \left(\frac{W_0(\sigma z;a)}{W_0(\sigma;a)}\right)^{\!n}
+\left(W_\xi^{\mathrm{PPP}}(1+i\tau) + O\!\left(\frac{L(1+|\tau|)}{k}\right)\right), \\
+e^{i\sigma\tau}\left(\frac{W_0(\sigma z;a)}{W_0(\sigma;a)}\right)^{\!n}
+&= e^{-(\gamma+\alpha)} e^{\Phi_\alpha(1+i\tau)}
++ O\!\left(\bigl|e^{\Phi_\alpha(1+i\tau)}\bigr|\frac{L^2(1+\tau^2)}{k}\right).
+\end{align*}
+Combinando tali sviluppi con il Lemma~\ref{lem:uniform-W-V}(ii)--(iii) e~\eqref{eq:Phi-abs} si ottiene
+\begin{align*}
+Z_{I,k} &= e^{-(\gamma+\alpha)}\bigl(\mathcal{I}_\infty(\alpha) + O(L^r/k)\bigr), \\
+Z_{J,k} &= e^{-(\gamma+\alpha)}\bigl(L^2\mathcal{I}_\infty(\alpha) + 2L\mathcal{M}_\infty(\alpha) + O(1)\bigr),
+\end{align*}
+con $r := \max(2, \max_\lambda 2d_\lambda)$, avendo sfruttato la simmetria in $(\mu_1,\mu_2)$ per
+raccogliere i termini lineari in $L$ in $2\mathcal{M}_\infty(\alpha)$. Dividendo tramite
+$k W_0(\sigma; a) = \sigma^{-1}(1 + O(L/k))$ si ottiene~\eqref{eq:quotient-limit}.
+\end{proof}
+
+Definiamo infine i momenti monodimensionali (per interi $n \ge 0$ e $\alpha \in \R$)
+\begin{align}
+U_n(\alpha) &:= \frac{n!}{\pi}\re \int_0^\infty \frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau, \nonumber\\
+L_n(\alpha) &:= \frac{n!}{\pi}\re \int_0^\infty \bigl(\gamma + \log(1+i\tau)\bigr)\frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau. \label{eq:Un-Ln-def}
+\end{align}
+
+\begin{proposition}[Riduzione ai momenti e identità per parti]\label{prop:UL-reduction}
+Per ogni intero $n \ge 0$ e $\alpha \in \R$:
+\begin{enumerate}
+\item[(i)] $L_n(\alpha) = U_{n+1}(\alpha) - (1+\alpha) U_n(\alpha)$.
+\item[(ii)] Scrivendo $\widetilde{Q}_\lambda(x) = \sum_{i=0}^{d_\lambda} c_{\lambda, i} x^i$ con vettore
+colonna complessivo $c \in \R^N$ ($N = \sum_{\lambda\in\Lambda_W}(d_\lambda + 1)$), si ha
+$\mathcal{I}_\infty(\alpha) = c^\top I(\alpha) c$ e
+$2\mathcal{M}_\infty(\alpha) - \alpha \mathcal{I}_\infty(\alpha) = c^\top D_{\mathrm{net}}(\alpha) c$,
+dove $D_{\mathrm{net}}(\alpha) := M(\alpha) + M(\alpha)^\top - \alpha I(\alpha)$ e, per gli indici di
+base $(\lambda_1, i), (\lambda_2, j)$ con $n := i+j$,
+\begin{align}
+I_{(\lambda_1,i),(\lambda_2,j)}(\alpha)
+&= \sum_r w_{\lambda_1\sqcup\lambda_2,\, r} \frac{n!}{(n+r)!} U_{n+r}(\alpha), \label{eq:I-entry}\\
+M_{(\lambda_1,i),(\lambda_2,j)}(\alpha)
+&= \sum_r w_{\lambda_1\sqcup\lambda_2,\, r} \frac{n!}{(n+r)!}
+\bigl(\Harm_n U_{n+r}(\alpha) - L_{n+r}(\alpha)\bigr)
+- \Harm_j I_{(\lambda_1,i),(\lambda_2,j)}(\alpha) \nonumber\\
+&\quad + \sum_{\emptyset \neq S \subseteq [\ell(\lambda_2)]}
+\frac{j!\,(s-1)!}{(j+s)!}
+\sum_r w_{\lambda_1\sqcup\lambda_{2\setminus S},\, r}
+\frac{(n+s)!}{(n+s+r)!} U_{n+s+r}(\alpha), \label{eq:M-entry}
+\end{align}
+con $s := s_{\lambda_2}(S)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Dimostrazione]
+Derivando $\frac{1}{i}\frac{\dd}{\dd\tau}(e^{\Phi_\alpha(z)}/z^{n+1})
+= (\gamma+\alpha+1+\log z)e^{\Phi_\alpha(z)}/z^{n+1} - (n+1)e^{\Phi_\alpha(z)}/z^{n+2}$ ($z=1+i\tau$)
+e integrando su $[-R, R]$, i termini al bordo $O(R^{-n} e^{-\pi R/2}) \to 0$ per~\eqref{eq:Phi-abs}; la
+simmetria di coniugazione $\Phi_\alpha(\bar{z}) = \overline{\Phi_\alpha(z)}$ fornisce~(i).
+
+Per la~(ii), il prolungamento analitico degli integrali Gamma ($\re z = 1$) dà
+\begin{equation}\label{eq:gamma-moments}
+\int_0^\infty x^n e^{-zx}\dd x = \frac{n!}{z^{n+1}},
+\qquad
+\int_0^\infty x^n (\log x) e^{-zx}\dd x
+= \frac{n!}{z^{n+1}}\bigl(\Harm_n - \gamma - \log z\bigr),
+\end{equation}
+e il cambio $u = x v$ fornisce le identità polinomiali esatte ($j \ge 0, s \ge 2$)
+\begin{align}
+(\cH x^j) &= x^j \int_0^1 \frac{1 - (1-v)^j}{v}\dd v
+= x^j \int_0^1 \sum_{r=0}^{j-1}(1-v)^r\dd v = \Harm_j x^j, \nonumber\\
+(B_{s-1} x^j) &= x^{j+s}\int_0^1 (1-v)^j v^{s-1}\dd v
+= \frac{j!(s-1)!}{(j+s)!} x^{j+s}. \label{eq:H-Bs-monomial}
+\end{align}
+Inserendo $\widetilde{Q}_{\lambda_1}, \widetilde{Q}_{\lambda_2}$, \eqref{eq:WPPP-def}, \eqref{eq:gamma-moments}
+e~\eqref{eq:H-Bs-monomial} in~\eqref{eq:I-inf-def}--\eqref{eq:M-inf-def}, e riindicizzando
+$(\mu_1,\mu_2,\lambda,S)$ con $\lambda_{\setminus S} = \mu_2$ tramite $(\lambda_1,\lambda_2,S)$ con
+$\mu_2 = \lambda_{2\setminus S}$, si ottengono~\eqref{eq:I-entry}--\eqref{eq:M-entry} usando
+$\frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(z)} z^{-(m+1)}\dd\tau = \frac{1}{m!}U_m(\alpha)$
+e simmetrizzando $2 c^\top M(\alpha) c = c^\top(M(\alpha)+M(\alpha)^\top)c$.
+\end{proof}
+
+\section{Certificazione rigorosa in Arb e verifica indipendente}\label{sec:cert}
+
+Per le Proposizioni~\ref{prop:contour-limit} e~\ref{prop:UL-reduction}, il Teorema~\ref{thm:main} si
+riduce rigorosamente alla verifica di $I(\alpha) \succ 0$ (che garantisce $\mathcal{I}_\infty(\alpha) = c^\top I(\alpha) c > 0$)
+e della stima inferiore del quoziente di Rayleigh
+\begin{equation}\label{eq:rq-cert}
+\frac{c^\top D_{\mathrm{net}}(\alpha) c}{c^\top I(\alpha) c} \ge -c^*
+\end{equation}
+per $\alpha = -523/2000$ e per il vettore testimone razionale esatto $c \in \mathbb{Q}^{250}$ (serializzato
+a $60$ cifre significative e letto come razionali esatti \texttt{fmpq} prima della conversione in sfere Arb).
+Mentre il Lemma~\ref{lem:nu-pos} garantisce $\mathcal{I}_\infty(\alpha) > 0$ per la sola classe radiale
+$\Lambda_0$, per l'ansatz misto $\Lambda_9$ la positività (e in effetti la definita positività della
+matrice di Gram $I(\alpha)$) è stabilita in modo rigoroso dalla fattorizzazione $LDL^\top$ per intervalli.
+
+Per escludere errori comuni di implementazione, la generazione/certificazione (\texttt{cert\_asymptotic.py})
+e il verificatore indipendente (\texttt{verify\_asymptotic.py}) non condividono codice e valutano i momenti
+attraverso due percorsi distinti:
+\begin{itemize}
+\item \textbf{Certificatore (\texttt{cert\_asymptotic.py}):} Valuta $U_0(\alpha),\dots,U_{41}(\alpha)$
+a precisione $768$ bit su $[0, 200]$ (sottointervalli $[0,1,4,12,35,90,200]$, \texttt{acb.integral} adattivo
+\cite{JohanssonArb}, tolleranza $10^{-145}$), aggiunge il residuo analitico su $[200,\infty)$ dal
+Lemma~\ref{lem:arb-bounds}(i), e costruisce $D_{\mathrm{net}}(\alpha)$ mediante la Proposizione~\ref{prop:UL-reduction}(i).
+\item \textbf{Verificatore indipendente (\texttt{verify\_asymptotic.py}):} Valuta $U_0(\alpha),\dots,U_{40}(\alpha)$
+e valuta \emph{direttamente} $L_0(\alpha),\dots,L_{40}(\alpha)$ \emph{senza} usare l'integrazione per parti,
+sulla griglia geometrica indipendente $[0, 0.35, 0.9, 2.0, 4.5, 10, 22, 45, 85, 145, 225]$ ($T = 225$) tramite
+quadratura di Gauss--Legendre a $240$ nodi in aritmetica Arb a $768$ bit. Ogni nodo e peso $(x_i, w_i)$
+($0 \le i \le 239$) viene calcolato internamente in Arb tramite \texttt{arb.legendre\_p\_root(240, i, weight=True)},
+restituendo sfere centro--raggio certificate prive di tabelle in virgola mobile.
+\end{itemize}
+
+Riguardo alla scelta dei parametri nel Teorema~\ref{thm:main}, lungo la sezione trasversale $W \le 9$
+($30$ blocchi, $N = 250$) il quoziente di Rayleigh varia di appena $\approx 10^{-7}$ su
+$\alpha \in [-0.262, -0.260]$ ($-0.26098864$ in $\alpha = -0.262$, $-0.2609886366$ in $-0.2615$,
+$-0.26098873$ in $-0.260$), cosicché la scelta razionale $\alpha = -523/2000 = -0.2615$ cattura
+l'ottimo piatto a $7$ cifre significative, mantenendo le lunghezze delle partizioni concatenate $\le 8$
+e un rapporto dei pivot di Cholesky per $I(\alpha)$ pari a $7.90 \times 10^{-11}$.
+
+\begin{lemma}[Stime analitiche di coda e di quadratura su ellissi di Bernstein]\label{lem:arb-bounds}
+Siano fissati $\alpha \in \R$, $T \ge 10$, e $n \ge 0$ intero, e poniamo $C_T := \gamma + \frac{\pi}{2} + \log(1+T)$.
+\begin{enumerate}
+\item[(i)] Gli errori di troncamento per~\eqref{eq:Un-Ln-def} su $[T,\infty)$ soddisfano
+\begin{align}
+\left| U_n(\alpha) - \frac{n!}{\pi}\re \int_0^T \frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau \right|
+&\le \frac{2 e^{\gamma+\alpha+1} n!\, e^{-\pi T/2}}{\pi^2 T^n}, \label{eq:Un-tail}\\
+\left| L_n(\alpha) - \frac{n!}{\pi}\re \int_0^T \bigl(\gamma+\log(1+i\tau)\bigr)
+\frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau \right|
+&\le \frac{n!\, e^{\gamma+\alpha+1} e^{-\pi T/2}}{\pi T^n}\left(\frac{2 C_T}{\pi} + \frac{4}{\pi^2 T}\right). \label{eq:Ln-tail}
+\end{align}
+\item[(ii)] Siano $[a,b] = [\mu - h, \mu + h] \subset [0, T]$ ($h > 0$), $E_\rho$ ($\rho > 1$) l'ellisse di
+Bernstein di semiassi $K := \frac{1}{2}(\rho+\rho^{-1})$ e $B := \frac{1}{2}(\rho-\rho^{-1})$, e
+$\overline{D}_\rho$ la sua regione chiusa interna. Se $(1 - h B > 0) \lor (\mu - h K > 0)$, allora per ogni
+$u \in \overline{D}_\rho$ il punto $z(u) := 1 + i(\mu + h u)$ evita la semiretta di diramazione $(-\infty, 0]$.
+\item[(iii)] Sotto la condizione~(ii), se $f$ è olomorfa in un intorno di $\mu + h\overline{D}_\rho$ e
+$M := \sup_{u \in E_\rho} |f(\mu + h u)|$, la formula di Gauss--Legendre a $m$ punti $Q_m$ su $[a,b]$ soddisfa
+\begin{equation}\label{eq:GL-bernstein-err}
+\left|\int_a^b f(t)\dd t - Q_m[f]\right| \le \frac{8 h M}{(\rho - 1)\rho^{2m-1}}.
+\end{equation}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}[Dimostrazione]
+Per la~(i), $\arctan\tau \ge \frac{\pi}{2} - \frac{1}{\tau}$ e~\eqref{eq:Phi-abs} danno
+$|e^{\Phi_\alpha(1+i\tau)}/(1+i\tau)^{n+1}| \le e^{\gamma+\alpha+1} T^{-n} e^{-\pi\tau/2}$ ($\tau \ge T$),
+provando~\eqref{eq:Un-tail}. Inoltre $|\gamma+\log(1+i\tau)| \le C_T + \frac{\tau-T}{T}$, il cui integrale
+contro $e^{-\pi\tau/2}$ dimostra~\eqref{eq:Ln-tail}.
+
+Per la~(ii), ogni $u = x_u + i y_u \in \overline{D}_\rho$ verifica $|x_u| \le K$ e $|y_u| \le B$, quindi
+$1 - hB > 0 \implies \re z(u) \ge 1 - hB > 0$ e $\mu - hK > 0 \implies \im z(u) \ge \mu - hK > 0$.
+
+Per la~(iii), $g(u) := f(\mu+h u)$ si trasporta tramite $u = \frac{1}{2}(w+w^{-1})$ in una funzione
+olomorfa su un intorno aperto della corona $\{\rho^{-1} \le |w| \le \rho\}$. Nello sviluppo di Chebyshev
+$g(u) = \sum_{j=0}^\infty a_j T_j(u)$ ($T_j(\frac{w+w^{-1}}{2}) = \frac{1}{2}(w^j+w^{-j})$), confrontando i
+coefficienti di Laurent su $|w| = 1$ si ha $c_j = a_j/2$ ($j \ge 1$); spostando il cammino su $|w| = \rho$
+segue $a_j = \frac{1}{\pi i}\oint_{|w|=\rho} g(\frac{w+w^{-1}}{2}) w^{-j-1}\dd w$, da cui
+$|a_j| \le 2M\rho^{-j}$ \cite{Trefethen}. Poiché $Q_m$ è esatta fino al grado $2m-1$ e
+$|\int_{-1}^1 T_j - Q_m[-1,1][T_j]| \le 4$, riscalando su $[a,b]$ segue~\eqref{eq:GL-bernstein-err}.
+\end{proof}
+
+L'esecuzione di \texttt{verify\_asymptotic.py} controlla $(1-hB > 0)\lor(\mu-hK > 0)$ su ogni pannello,
+maggiora $M = \sup_{u\in E_\rho} |G(1+i(\mu+hu))|$ coprendo $E_\rho = \{K\cos\theta + i B\sin\theta : \theta \in [0, 2\pi]\}$ mediante $32$
+scatole rettangolari complesse Arb $u_j := K\cos\Theta_j + i B\sin\Theta_j$ sui sottointervalli
+angolari $\Theta_j := [2\pi j/32,\, 2\pi(j+1)/32]$ ($0 \le j \le 31$, verificando la finitezza di
+$\log z(u_j)$ e $|z(u_j)| > 0$ su ogni scatola; poiché le integrande olomorfe $G(z)$ in~\eqref{eq:Un-Ln-def}
+verificano $\overline{G(\bar{z})} = G(z)$ ed $E_\rho = \overline{E_\rho}$, $t \mapsto \frac{1}{2}(G(1+it)+G(1-it))$
+estende olomorficamente $\re G(1+it)$ su $\mu+h\overline{D}_\rho$ con modulo $\le M$), somma~\eqref{eq:GL-bernstein-err} e~\eqref{eq:Un-tail}--\eqref{eq:Ln-tail},
+verifica la coerenza con tutti i momenti salvati $U_0,\dots,U_{40}$ (i momenti indipendenti
+$U_0,\dots,U_{40}$ e $L_0,\dots,L_{40}$ raggiungono raggio relativo massimo Arb $1.30 \times 10^{-148}$),
+certifica $I(\alpha) \succ 0$ via fattorizzazione $LDL^\top$ per intervalli,
+supera tutti i $9/9$ test avversariali di manomissione, certifica~\eqref{eq:rq-cert}, e stabilisce
+\begin{equation}\label{eq:eta-cert}
+\begin{aligned}
+\eta_* \in \bigl[&{-0.26098863656469156541919317124794770922900940468892},\\
+&{-0.26098863656469156541919317124794770922900940468891}\bigr]
+\end{aligned}
+\end{equation}
+(arrotondato verso l'esterno a $50$ cifre decimali dalla sfera Arb certificata a $768$ bit di raggio
+$4.03 \times 10^{-149}$), dimostrando il Teorema~\ref{thm:main}.
+
+Come controlli incrociati indipendenti (evidenza di supporto non certificata per le Proposizioni~\ref{prop:exact-laplace}
+e~\ref{prop:contour-limit}): il confronto tra la Proposizione~\ref{prop:exact-laplace} e la quadratura diretta
+di Duffy in dimensione $5$ nello spazio reale ($14$ punti di Gauss--Legendre per asse contro Laplace Arb a
+$320$ bit) per $k = 5$ su tutti i $30$ blocchi di $\Lambda_9$ dà errori relativi $5.64 \times 10^{-8}$ ($I$),
+$8.01 \times 10^{-8}$ ($kJ$), e $2.37 \times 10^{-8}$ ($R_5(F) = 1.95890046\dots$). La Tabella~\ref{tab:finite-k}
+valuta $R_k(F) - \log k$ per il testimone $\Lambda_9$ su $k = 10^3,\dots,10^8$ in aritmetica di Laplace Arb
+a $448$ bit (quadratura composita a $64$ nodi, controllata in $k = 10^6$ contro $80$ nodi con scarto Arb a
+$448$ bit pari a $3.71 \times 10^{-23}$), confermando la decrescita monotona del resto $O(L^r/k)$ dato da
+$\Delta_L(k) := (R_k(F) - L) - \eta_{L\text{-ref}}(k)$, dove
+\[
+\eta_{L\text{-ref}}(k) := \frac{L^2\mathcal{I}_\infty(\alpha) + 2L\mathcal{M}_\infty(\alpha) + \mathcal{N}_\infty(\alpha)}{(L+\alpha)\mathcal{I}_\infty(\alpha)} - L
+\]
+mantiene il termine interno $O(1)$ dato da
+\[
+\mathcal{N}_\infty(\alpha) := \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau)}
+\sum_{\mu_1,\mu_2\in\Lambda_9} W_{\mu_1\sqcup\mu_2}^{\mathrm{PPP}}(1+i\tau)\, N_{\mu_1,\mu_2}^{(2)}(\tau)\dd\tau,
+\]
+calcolato in Arb a $384$ bit mediante i momenti bilogaritmici
+$L_n^{(2)}(\alpha) := \frac{n!}{\pi}\re\int_0^\infty (\gamma+\log(1+i\tau))^2 \frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau$
+e l'identità esatta per parti $L_n^{(2)}(\alpha) = L_{n+1}(\alpha) - (1+\alpha)L_n(\alpha) - (n+1)^{-1}U_{n+1}(\alpha)$.
+
+\begin{table}[ht]
+\centering
+\caption{Convergenza a $k$ finito del testimone $\Lambda_9$ (Laplace Arb a $448$ bit) verso il
+limite asintotico certificato a $768$ bit, con residuo $\Delta_L(k)$ a $384$ bit e fit ai minimi
+quadrati in $1/(L+\alpha)$ di grado~$2$ su $k \in \{10^5, 10^6, 10^7, 10^8\}$.}\label{tab:finite-k}
+\small
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$k$ & $R_k(F) - \log k$ & $\Delta_L(k)$ & Guadagno vs.\ limite \cite{Lewulis} ($-0.273572$) \\
+\midrule
+$10^3$ & $-0.135735$ & $+1.67 \times 10^{-3}$ & $+0.137837$ \\
+$10^4$ & $-0.168933$ & $+2.71 \times 10^{-4}$ & $+0.104639$ \\
+$10^5$ & $-0.187944$ & $+4.38 \times 10^{-5}$ & $+0.085628$ \\
+$10^6$ & $-0.200383$ & $+6.56 \times 10^{-6}$ & $+0.073189$ \\
+$10^7$ & $-0.209188$ & $+9.23 \times 10^{-7}$ & $+0.064384$ \\
+$10^8$ & $-0.215757$ & $+1.24 \times 10^{-7}$ & $+0.057815$ \\
+\midrule
+Fit $1/(L+\alpha)$ & $-0.260771$ & --- & $+0.012801$ \\
+Limite certificato & $\mathbf{-0.260989}$ & --- & $\mathbf{+0.012583}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{remark}[Problema aperto]
+Combinando il Teorema~\ref{thm:main} con la barriera~\eqref{eq:pm8b-barrier} si ha
+\[
+0 \le \liminf_{k\to\infty}(\log k - M_k) \le \limsup_{k\to\infty}(\log k - M_k) \le 0.26098863656469156542.
+\]
+Resta aperto stabilire se tale limite esista e sia strettamente positivo oppure se $M_k = \log k - o(1)$.
+\end{remark}
+
+\section{Riproducibilità e verifica degli artefatti}\label{sec:repro}
+
+Il certificato, il verificatore indipendente, i controlli a $k$ finito ed entrambe le versioni
+linguistiche del manoscritto sono archiviati in:
+\begin{center}
+\url{https://doi.org/10.5281/zenodo.24528079}
+\end{center}
+Dalla radice del repository, eseguendo il comando di verifica
+\begin{samepage}
+\begin{verbatim}
+python verify_asymptotic.py cert_asymptotic.json --entry C
+\end{verbatim}
+\end{samepage}
+si lancia il verificatore indipendente su ellissi di Bernstein in circa $24.5\text{ s}$ (testato su
+\texttt{Windows~11}, Python \texttt{3.13.17}, \texttt{python-flint 0.9.0}, picco RSS $77.8\text{ MB}$),
+mentre \texttt{python verify\_all.py} esegue la suite completa in $18\text{--}36\text{ s}$ su al più
+$4$ thread CPU (con \texttt{numpy 2.5.4}, \texttt{scipy 1.18.1} e \texttt{mpmath 1.4.1} per gli
+script supplementari). Le impronte SHA-256 canoniche sono riportate nella Tabella~\ref{tab:sha256}.
+
+\begin{table}[ht]
+\centering
+\caption{Impronte SHA-256 canoniche del certificato asintotico e del verificatore Arb indipendente.}\label{tab:sha256}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Artefatto & Impronta SHA-256 \\
+\midrule
+\texttt{cert\_asymptotic.json} & \texttt{\scriptsize 541e5d4fd45aff5905b38aa30dd5b77cc4d9f11a360823946498f26e80e02921} \\
+\texttt{verify\_asymptotic.py} & \texttt{\scriptsize e3721c23fdeaec99c95d9a6d34ae83ee9516410f6ce035d6cf53efaf53970a78} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Assistenza computazionale e verifica}
+L'esplorazione numerica e la prototipazione del codice sono state coadiuvate da strumenti
+computazionali e di intelligenza artificiale. Ogni dimostrazione matematica in questo manoscritto
+è stata revisionata analiticamente, e ogni costante asintotica e momento riportato è verificato
+indipendentemente in modo deterministico tramite aritmetica per sfere Arb (\texttt{verify\_asymptotic.py}).
+
+\begin{thebibliography}{9}\raggedright
+
+\bibitem{GPY}
+D.~A.~Goldston, J.~Pintz, and C.~Y.~Y{\i}ld{\i}r{\i}m,
+\emph{Primes in tuples.~I},
+Ann. of Math. (2) \textbf{170} (2009), no.~2, 819--862.
+
+\bibitem{JohanssonArb}
+F.~Johansson,
+\emph{Arb: efficient arbitrary-precision midpoint-radius interval arithmetic},
+IEEE Trans. Comput. \textbf{66} (2017), no.~8, 1281--1292.
+
+\bibitem{Lewulis}
+P.~Lewulis,
+\emph{Clusters of primes revisited},
+preprint (October 2026), \href{https://arxiv.org/abs/2610.41113}{arXiv:2610.41113}.
+
+\bibitem{Maynard}
+J.~Maynard,
+\emph{Small gaps between primes},
+Ann. of Math. (2) \textbf{181} (2015), no.~1, 383--413.
+
+\bibitem{PM8b}
+D.~H.~J.~Polymath,
+\emph{Variants of the Selberg sieve, and bounded intervals containing many primes},
+Res. Math. Sci. \textbf{1} (2014), Art.~12, 83 pp.
+
+\bibitem{Stadlmann2025}
+J.~Stadlmann,
+\emph{On primes in arithmetic progressions and bounded gaps between many primes},
+Adv. Math. \textbf{468} (2025), Art.~110190, \href{https://doi.org/10.1016/j.aim.2025.110190}{doi:10.1016/j.aim.2025.110190}
+(\href{https://arxiv.org/abs/2309.00425}{arXiv:2309.00425}).
+
+\bibitem{Stadlmann2026}
+J.~Stadlmann,
+\emph{Bounded gaps between primes},
+preprint (August 2026), \href{https://arxiv.org/abs/2608.31126}{arXiv:2608.31126}.
+
+\bibitem{Trefethen}
+L.~N.~Trefethen,
+\emph{Is Gauss quadrature better than Clenshaw--Curtis?},
+SIAM Rev. \textbf{50} (2008), no.~1, 67--87.
+
+\bibitem{Zhang}
+Y.~Zhang,
+\emph{Bounded gaps between primes},
+Ann. of Math. (2) \textbf{179} (2014), no.~3, 1121--1174.
+
+\end{thebibliography}
+
+\end{document}

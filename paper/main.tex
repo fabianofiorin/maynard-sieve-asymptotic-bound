@@ -1,0 +1,1116 @@
+\documentclass[11pt, reqno]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}[lemma]{Proposition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[lemma]{Remark}
+
+\numberwithin{equation}{section}
+
+\DeclareMathOperator{\re}{Re}
+\DeclareMathOperator{\im}{Im}
+
+\newcommand{\Harm}{\mathsf{H}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\dd}{\,\mathrm{d}}
+
+\title[Asymptotic bounds on Maynard's sieve functional]{%
+Asymptotic lower bounds on Maynard's sieve functional\\
+and microscale uniqueness}
+
+\author{Fabiano Fiorin}
+\email{fabianofiorin06@gmail.com}
+
+\subjclass[2020]{Primary 11N05, 11N36; Secondary 65G20}
+\keywords{Bounded gaps between primes, Maynard--Tao sieve, symmetric power sums,
+Laplace transforms, rigorous interval arithmetic}
+
+\begin{document}
+
+\begin{abstract}
+We establish a new asymptotic lower bound on Maynard's sieve variational functional
+$M_k := \sup_F R_k(F)$ ($R_k(F) := k J(F)/I(F)$) as $k \to \infty$, improving Lewulis's
+bound $M_k \ge \log k - 0.273572 + o(1)$ to
+\[
+M_k \ge \log k - 0.260989 + o(1).
+\]
+This gain arises from combining two mechanisms: (i) an $O(k)$ shift of the reciprocal
+scale $a = k(\log k + \alpha)$ at $\alpha = -523/2000$ that aligns the simplex
+truncation $P_1 \le 1$ against an asymmetric $1$-stable limiting density, and
+(ii) the complete weight-graded hierarchy $\Lambda_9$ of symmetric power-sum products
+$\prod_{r \in \lambda} (\sigma^r P_r)$ over all $30$ integer partitions $\lambda$ of
+weight at most $9$ with parts at least $2$ ($N = 250$ polynomial parameters).
+Restricting to the Bombieri--Vinogradov level ($\theta = 1/2$) and conditionally
+assuming the Elliott--Halberstam conjecture ($\theta = 1$), this improves the respective
+leading constants for $H_m := \liminf_{n\to\infty}(p_{n+m}-p_n)$ to
+$H_m \le (5.1928517 + o(1))\,m\,e^{4m}$ and $H_m \le (2.5964259 + o(1))\,m\,e^{2m}$
+(while unconditionally as $m \to \infty$, equidistribution beyond $\theta = 1/2$ yields
+smaller exponential growth rates). Conversely, we prove a Microscale Uniqueness Theorem:
+among regular reciprocal-type microscale kernels $g(u)$ normalized to $m_0(g)=1$ and
+$g(u) \sim u^{-1}$ as $u \to \infty$, the Cauchy kernel $h(u) = (1+u)^{-1}$ is uniquely optimal
+within the product-kernel and radial-polynomial class, with every normalized kernel $g \neq h$
+(a.e.) incurring the strict penalty $-\int_0^\infty (1+u)(g(u) - h(u))^2 \dd u < 0$ (so among
+unnormalized kernels, $h$ is unique up to multiplicative scaling and positive argument dilation).
+All bounds are proved
+analytically and deterministically certified in
+$768$-bit Arb ball arithmetic via an independent Bernstein-ellipse Gauss--Legendre verifier.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction and Main Results}
+
+Let $p_n$ denote the $n$-th prime and set $H_m := \liminf_{n\to\infty} (p_{n+m} - p_n)$
+for each integer $m \ge 1$. Following Zhang \cite{Zhang} and Goldston--Pintz--Y{\i}ld{\i}r{\i}m
+\cite{GPY}, Maynard \cite{Maynard} and Tao reduced the detection of bounded prime gaps in
+admissible $k$-tuples to maximizing the symmetric Rayleigh quotient
+$R_k(F) := k J(F)/I(F)$ on the $k$-simplex
+$\cR_k := \{(t_1,\dots,t_k) \in [0,\infty)^k : t_1 + \cdots + t_k \le 1\}$, where
+\begin{align*}
+I(F) &:= \int_{\cR_k} F(t_1,\dots,t_k)^2 \dd t_1\cdots \dd t_k, \\
+J(F) &:= \int_{\cR_{k-1}} \left(\int_0^{1-\sum_{i=1}^{k-1} t_i}
+F(t_1,\dots,t_k)\dd t_k \right)^{\!2} \dd t_1\cdots \dd t_{k-1},
+\end{align*}
+and $M_k := \sup_{F} R_k(F)$ ranges over locally square-integrable symmetric functions
+with $I(F) > 0$. By \cite[Theorems~22 and~26]{PM8b} (at $\varepsilon = 0$), if primes are equidistributed in
+arithmetic progressions at level $\vartheta \in (0, 1)$, then $M_k > 2m/\vartheta$ implies
+$H_m \le H(k)$, the minimal diameter of an admissible $k$-tuple; Bombieri--Vinogradov
+provides $\vartheta = 1/2$ unconditionally ($M_k > 4m$), while the Elliott--Halberstam conjecture
+corresponds to $\theta = 1$ (specifically, $\mathrm{EH}[\vartheta]$ holding for every $\vartheta \in (0, 1)$,
+yielding $H_m \le H(k)$ whenever $M_k > 2m$).
+
+Asymptotically as $k \to \infty$, Maynard \cite{Maynard} obtained
+$M_k \ge \log k - 2\log\log k - 2 + o(1)$, and Polymath8b \cite[Corollary~37]{PM8b}
+established $M_k \ge \log k - O(1)$ together with the upper barrier
+\begin{equation}\label{eq:pm8b-barrier}
+M_k \le \frac{k}{k-1}\log k \qquad (k \ge 2),
+\end{equation}
+forcing any lower bound $M_k \ge \log k - c^* + o(1)$ to satisfy $c^* \ge 0$. Combining
+equidistribution beyond $\theta = 1/2$ yields strictly smaller unconditional exponential
+rates for $H_m$ as $m \to \infty$: Polymath8b \cite{PM8b} proved $H_m \ll m\exp\bigl((4-\tfrac{28}{157})m\bigr)$, and Stadlmann \cite{Stadlmann2025}
+improved this via smooth-moduli equidistribution ($\theta = \tfrac{1}{2}+\tfrac{1}{40}-\varepsilon$)
+to $H_m = O(\exp(3.8075 m))$ (and later $H_1 \le 240$ \cite{Stadlmann2026}).
+
+Recently, Lewulis \cite{Lewulis} analyzed the exact Laplace representation of $I(F)$ and
+$J(F)$ for the radial reciprocal ansatz
+$F(t_1,\dots,t_k) = \widetilde{Q}((\log k)(1-P_1)) \prod_{i=1}^k (1 + a t_i)^{-1}$
+($P_r := \sum_{i=1}^k t_i^r$) at $a = k\log k$, optimizing over polynomials $\widetilde{Q}$
+of degree at most $20$ to prove \cite[Theorem~3]{Lewulis}:
+\begin{equation}\label{eq:lewulis-bound}
+M_k \ge \log k - 0.273572 + o(1) \qquad (k \to \infty).
+\end{equation}
+
+In this paper we both characterize the microscale barrier in~\eqref{eq:lewulis-bound} and
+overcome its macroscopic radial limit. Throughout, $\gamma = 0.57721566\dots$ denotes the
+Euler--Mascheroni constant, $L := \log k$, and $\Harm_n := \sum_{j=1}^n j^{-1}$ ($\Harm_0 := 0$)
+is the $n$-th harmonic number.
+
+\begin{theorem}[Microscale Uniqueness]\label{thm:uniqueness}
+Let $h(u) := (1+u)^{-1}$ for $u \ge 0$, and let $g \colon [0,\infty) \to \R$ be a
+measurable function satisfying:
+\begin{enumerate}
+\item[(H1)] $g \in L^2(0,\infty) \cap L^4(0,\infty)$ and $m_0(g) := \int_0^\infty g(u)^2 \dd u > 0$;
+\item[(H2)] $g(u) = c u^{-1} + O(u^{-1-\delta})$ as $u \to \infty$ for some $c \in \R \setminus \{0\}$ and $\delta > 0$.
+\end{enumerate}
+Set $\tilde{g} := c^{-1} g$, $\lambda := m_0(\tilde{g})^{-1} = c^2 / m_0(g) > 0$, and
+$g^*(u) := \lambda \tilde{g}(\lambda u) = \frac{c}{m_0(g)} g\bigl(\frac{c^2}{m_0(g)} u\bigr)$
+(note that (H1)--(H2) already imply $\int_0^\infty u (g^*(u) - h(u))^2 \dd u < \infty$). Let $\widetilde{Q}$ be any non-zero real polynomial, set
+$\sigma := \log k + \alpha$, $a' := k\sigma$, $a := \lambda k\sigma = \lambda a'$, and define
+\begin{equation}\label{eq:Fg-def}
+F_g(t_1,\dots,t_k) := \widetilde{Q}\bigl(\sigma(1 - P_1)\bigr) \prod_{i=1}^k g(a t_i).
+\end{equation}
+Then $m_0(g^*) = 1$, $g^*(u) = u^{-1} + O(u^{-1-\delta})$ as $u \to \infty$, and by scale
+invariance $R_k(F_g)$ at scale $a = \lambda k \sigma$ equals $R_k(F_{g^*})$ at scale $a'$.
+Moreover, for every $\alpha \in \R$, the limit
+$\eta(g^*; \alpha, \widetilde{Q}) := \lim_{k\to\infty}(R_k(F_{g^*}) - \log k)$ exists, is finite,
+and satisfies the pointwise shift identity
+$\eta(g^*; \alpha, \widetilde{Q}) = \bigl(\kappa(g^*) - \gamma\bigr) + \eta(h; \alpha + c_1(g^*) - \gamma, \widetilde{Q})$
+for $c_1(g^*) := \gamma - \int_0^\infty u(g^*(u)^2 - h(u)^2)\dd u \in \R$. Since
+$\eta(h; 0, \widetilde{Q}) \in \R$ and~\eqref{eq:pm8b-barrier} gives
+$\sup_{\alpha'\in\R}\eta(h; \alpha', \widetilde{Q}) \le 0$ (so all suprema are finite), taking
+$\sup_{\alpha\in\R}$ gives
+\begin{equation}\label{eq:shift-covariance}
+\sup_{\alpha \in \R} \eta(g^*; \alpha, \widetilde{Q})
+= \bigl(\kappa(g^*) - \gamma\bigr) + \sup_{\alpha' \in \R} \eta(h; \alpha', \widetilde{Q}),
+\end{equation}
+where
+\begin{equation}\label{eq:kappa-penalty}
+\kappa(g^*) - \gamma
+= -\int_0^\infty (1+u)\bigl(g^*(u) - h(u)\bigr)^2 \dd u \le 0,
+\end{equation}
+with equality if and only if $g^*(u) = h(u)$ almost everywhere on $(0,\infty)$, i.e.,
+$g(u) = C/(1 + \theta u)$ almost everywhere for some constants $C \in \R \setminus \{0\}$
+and $\theta > 0$ (uniqueness up to multiplicative scaling and positive argument dilation).
+\end{theorem}
+
+Theorem~\ref{thm:uniqueness} proves that no asymptotic improvement beyond~\eqref{eq:lewulis-bound}
+is available by varying the reciprocal microscale factor $g(u)$ inside the radial class.
+Gains must instead come from the macroscopic polynomial structure on $\cR_k$: shifting $a = k(\log k + \alpha)$
+by an $O(k)$ offset $\alpha < 0$ and adjoining higher-order symmetric power sums $P_r = \sum_{i=1}^k t_i^r$.
+
+Let $\Lambda_9$ denote the set of all $30$ integer partitions $\lambda = (\lambda_1, \dots, \lambda_{\ell(\lambda)})$
+with $\lambda_1 \ge \cdots \ge \lambda_{\ell(\lambda)} \ge 2$ and $|\lambda| := \sum_{j=1}^{\ell(\lambda)} \lambda_j \le 9$,
+grouped by weight $|\lambda| \in \{0, 2, \dots, 9\}$ (including the empty partition $()$ of length $0$):
+\begin{equation}\label{eq:Lambda9-list}
+\begin{aligned}
+\Lambda_9 = \bigl\{ &(),\ (2),\ (3),\ (4),\ (2,2),\ (5),\ (3,2),\ (6),\ (4,2),\ (3,3),\\
+&(2,2,2),\ (7),\ (5,2),\ (4,3),\ (3,2,2),\ (8),\ (6,2),\ (5,3),\\
+&(4,4),\ (4,2,2),\ (3,3,2),\ (2,2,2,2),\ (9),\ (7,2),\ (6,3),\\
+&(5,4),\ (5,2,2),\ (4,3,2),\ (3,3,3),\ (3,2,2,2)\bigr\}.
+\end{aligned}
+\end{equation}
+
+\begin{theorem}[Certified Asymptotic Bound on $M_k$]\label{thm:main}
+Let $L := \log k$, $\sigma := L + \alpha$, and $a := k\sigma$. Taking the symmetric
+power-sum ansatz over~\eqref{eq:Lambda9-list},
+\begin{equation}\label{eq:ansatz-C}
+F(t_1,\dots,t_k) = \left[ \sum_{\lambda \in \Lambda_9}
+\widetilde{Q}_\lambda\bigl(\sigma(1-P_1)\bigr)
+\prod_{j=1}^{\ell(\lambda)} \bigl(\sigma^{\lambda_j} P_{\lambda_j}\bigr) \right]
+\prod_{i=1}^k \frac{1}{1 + a t_i}
+\end{equation}
+at exact rational shift $\alpha = -523/2000 = -0.2615$ with the certified polynomial vector
+$c \in \mathbb{Q}^{250}$ having weight-graded degrees $20, 14, 12, 10, 8, 8, 6, 6, 5$ for
+$|\lambda| \in \{0, 2, \dots, 9\}$, respectively ($30$ blocks, $N = 250$ parameters), let
+$\eta_* := \frac{c^\top D_{\mathrm{net}}(\alpha) c}{c^\top I(\alpha) c}$ be its certified asymptotic
+Rayleigh limit (Proposition~\ref{prop:UL-reduction}, \eqref{eq:quotient-limit}, and~\eqref{eq:eta-cert})
+and set $c^* := -\eta_*$. Then unconditionally as $k \to \infty$:
+\begin{equation}\label{eq:main-bound}
+M_k \ge \log k - c^* + o(1), \qquad c^* \le 0.26098863656469156542.
+\end{equation}
+More precisely, $768$-bit Arb certification establishes the sharper bound
+$c^* \le 0.2609886365646915654192$.
+\end{theorem}
+
+Theorem~\ref{thm:main} improves Lewulis's constant~\eqref{eq:lewulis-bound} by more than
+$0.012583$. To isolate the two mechanisms behind this gain
+in light of Theorem~\ref{thm:uniqueness}, optimizing $\alpha$ alone on Lewulis's radial
+degree-$20$ ansatz ($\Lambda_0$ at $\alpha = -3367/10000$, Entry~A in the companion certificate)
+lowers $0.273572$ to $c_{\mathrm{rad}}^* \le 0.2654546851$ (a shift gain of $\approx 0.008117$),
+while adjoining the non-radial $\Lambda_9$ power sums contributes the remaining
+$\approx 0.004466$ reduction down to~\eqref{eq:main-bound}. The consequences for $H_m$ follow.
+
+\begin{corollary}[Asymptotic Prime-Gap Constants]\label{cor:Hm}
+From Theorem~\ref{thm:main} and \cite[Theorems~22 and~26]{PM8b}:
+\begin{enumerate}
+\item[(i)] \textbf{Pure Bombieri--Vinogradov regime ($\theta = 1/2$, not using $\theta > 1/2$):}
+As $m \to \infty$,
+\[
+H_m \le \bigl(4 e^{c^*} + o(1)\bigr)\,m\,e^{4m} \le \bigl(5.1928517 + o(1)\bigr)\,m\,e^{4m}.
+\]
+\item[(ii)] \textbf{Elliott--Halberstam regime ($\theta = 1$, conditional):} Assuming the
+Elliott--Halberstam conjecture, as $m \to \infty$,
+\[
+H_m \le \bigl(2 e^{c^*} + o(1)\bigr)\,m\,e^{2m} \le \bigl(2.5964259 + o(1)\bigr)\,m\,e^{2m}.
+\]
+\end{enumerate}
+Unconditionally as $m \to \infty$, prime equidistribution beyond $\theta = 1/2$ \cite{PM8b, Stadlmann2025}
+yields strictly smaller exponential growth rates down to $H_m = O(\exp(3.8075 m))$ \cite{Stadlmann2025}.
+\end{corollary}
+
+\begin{proof}
+Fix $\theta \in \{1/2, 1\}$. For integers $k \ge 3$, define
+$\varepsilon(k) := \max(0,\, \log k - c^* - M_k)$; by~\eqref{eq:main-bound} of Theorem~\ref{thm:main},
+$\varepsilon(k) \to 0$ as $k \to \infty$. Put $K_m := \lceil \exp(2m/\theta + c^*) \rceil$
+and $\delta_m := \sup_{k \ge K_m} \varepsilon(k) + m^{-1} \to 0^+$ as $m \to \infty$.
+Choosing $k_m := \lceil \exp(2m/\theta + c^* + \delta_m) \rceil \ge K_m$ gives
+$\varepsilon(k_m) \le \delta_m - m^{-1}$, whence
+\[
+M_{k_m} \ge \log k_m - c^* - \varepsilon(k_m)
+\ge \left(\frac{2m}{\theta} + c^* + \delta_m\right) - c^* - \bigl(\delta_m - m^{-1}\bigr)
+= \frac{2m}{\theta} + \frac{1}{m} > \frac{2m}{\theta}.
+\]
+By \cite[Theorems~22 and~26]{PM8b} (at $\varepsilon = 0$; when $\theta = 1$, assuming
+$\mathrm{EH}[\vartheta]$ for every $\vartheta \in (0, 1)$ and setting
+$\vartheta_m := \frac{2m}{2m + 1/(2m)} \in (0,1)$ gives
+$M_{k_m} \ge 2m + \frac{1}{m} > 2m + \frac{1}{2m} = \frac{2m}{\vartheta_m}$), this implies
+$H_m \le H(k_m)$. Taking the admissible tuple of the first $k_m$ primes strictly greater than
+$k_m$ gives $H(k_m) \le (1+o(1)) k_m \log k_m$ by the Prime Number Theorem. Substituting
+$k_m = (1+o(1)) e^{c^*} e^{2m/\theta}$ and $\log k_m = (2/\theta + o(1)) m$ yields
+$H_m \le (\frac{2}{\theta} e^{c^*} + o(1)) m e^{2m/\theta}$. Evaluating $4 e^{c^*}$ and
+$2 e^{c^*}$ for $c^* = -\eta_*$ (outer-rounded to $20$ decimal digits from the $768$-bit Arb ball)
+gives
+\begin{align*}
+4 e^{c^*} &\in [5.1928516527656657000 \pm 3.93\times 10^{-20}] < 5.1928517, \\
+2 e^{c^*} &\in [2.5964258263828328500 \pm 1.97\times 10^{-20}] < 2.5964259. \qedhere
+\end{align*}
+\end{proof}
+
+\begin{table}[ht]
+\centering
+\caption{Comparison of asymptotic bounds on $\log k - M_k$ and implied
+leading sieve constants under pure Bombieri--Vinogradov ($\theta = 1/2$) and Elliott--Halberstam
+($\mathrm{EH}$); the PM8b row gives the sieve-method upper barrier~\eqref{eq:pm8b-barrier} on $4e^{c^*}$ and $2e^{c^*}$.}\label{tab:summary}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Method / Result & Bound on $\log k - M_k$ & Pure BV ($4e^{c^*}$) & EH ($2e^{c^*}$) \\
+\midrule
+Maynard \cite{Maynard} & $\le 2\log\log k + 2 + o(1)$ & div.\ ($O(m^3 e^{4m})$) & div.\ ($O(m^3 e^{2m})$) \\
+Lewulis \cite{Lewulis} ($\alpha = 0$, $\deg 20$) & $\le 0.273572 + o(1)$ & $5.2586081$ & $2.6293041$ \\
+\textbf{Theorem~\ref{thm:main}} ($\alpha = -\tfrac{523}{2000}$, $\Lambda_9$, $N = 250$) & $\mathbf{\le 0.2609886366} + o(1)$ & $\mathbf{5.1928517}$ & $\mathbf{2.5964259}$ \\
+\midrule
+PM8b sieve barrier \cite{PM8b} & $\ge -\tfrac{\log k}{k-1}$ & $\ge 4$ & $\ge 2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:summary} places Theorem~\ref{thm:main} and Corollary~\ref{cor:Hm} alongside prior
+bounds. Section~\ref{sec:uniqueness} proves Theorem~\ref{thm:uniqueness}; Section~\ref{sec:laplace}
+derives the exact finite-$k$ set-partition Laplace representation for general $\Lambda_W$;
+Section~\ref{sec:asymptotic} passes to the $k \to \infty$ limit and reduces it to exact
+rational quadratic forms in $1$-dimensional moments; Section~\ref{sec:cert} presents the
+$768$-bit Arb certification and independent finite-$k$ verification; and Section~\ref{sec:repro}
+records reproducibility metadata.
+
+\section{Proof of the Microscale Uniqueness Theorem}\label{sec:uniqueness}
+
+Throughout the paper, $\log z$ denotes the principal branch of the complex logarithm on
+$\C \setminus (-\infty, 0]$. For $\alpha \in \R$ and $z = 1 + i\tau$ ($\tau \in \R$), define
+\begin{equation}\label{eq:Phi-nu-def}
+\Phi_\alpha(z) := z(\gamma + \alpha + \log z),
+\qquad
+\nu_\alpha(x) := \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau) - (1+i\tau)x}\dd\tau.
+\end{equation}
+Since $\re\Phi_\alpha(1+i\tau) = \gamma + \alpha + \frac{1}{2}\log(1+\tau^2) - \tau\arctan\tau$,
+we have
+\begin{equation}\label{eq:Phi-abs}
+\bigl|e^{\Phi_\alpha(1+i\tau)}\bigr|
+= e^{\gamma+\alpha} \sqrt{1+\tau^2}\, e^{-\tau\arctan\tau},
+\end{equation}
+so $\nu_\alpha(x)$ is continuous on $\R$ and decays at least as $O_\alpha(e^{-x})$.
+
+\begin{lemma}[Positivity and Analyticity of $\nu_\alpha$]\label{lem:nu-pos}
+For every $\alpha \in \R$, $\nu_\alpha$ extends holomorphically to the strip
+$\{x \in \C : |\im x| < \pi/2\}$, satisfies $\nu_\alpha(x) \ge 0$ for all $x \in \R$,
+and is not identically zero on $(0,\infty)$. Hence for any non-zero polynomial $\widetilde{Q}$,
+$\int_0^\infty \widetilde{Q}(x)^2 \nu_\alpha(x)\dd x > 0$.
+\end{lemma}
+
+\begin{proof}
+If $|\im x| \le \frac{\pi}{2} - \eta$ ($\eta > 0$), then $\arctan|\tau| \ge \frac{\pi}{2} - \frac{1}{|\tau|}$
+gives $\re(-(1+i\tau)x) - |\tau|\arctan|\tau| \le -\re x - \eta|\tau| + 1$. Thus the integrand
+in~\eqref{eq:Phi-nu-def} is bounded locally uniformly by $O_{\alpha,\eta}(e^{-\re x}(1+|\tau|)e^{-\eta|\tau|})$,
+proving holomorphicity on $\{|\im x| < \pi/2\}$ and real-analyticity on $\R$.
+
+By Lemma~\ref{lem:W0-props} below (whose proof depends solely on the definition of $W_0$ and
+is independent of Section~\ref{sec:uniqueness}), $W_0(s; a)$ for $a = k\sigma$ satisfies
+$W_0(\sigma(1+i\tau); k\sigma)/W_0(\sigma; k\sigma) = W_0((1+i\tau)/k; 1)/W_0(1/k; 1)$.
+Let $C_k(X; a) \ge 0$ be the $k$-fold convolution density of $t \mapsto (1+at)^{-2}$ ($t \ge 0$).
+Since $t \mapsto (1+at)^{-2} \in L^1 \cap L^2$, Plancherel gives $W_0(\sigma+i\omega; a) \in L^2(\R_\omega)$,
+so $W_0(\sigma+i\omega; a)^k \in L^1(\R_\omega)$ for $k \ge 2$ and Laplace inversion at
+$X = 1 - x/\sigma$ ($s = \sigma(1+i\tau)$) reads
+\[
+\frac{C_k(1 - x/\sigma; k\sigma)}{\sigma e^{\sigma - (\gamma+\alpha)} W_0(\sigma; k\sigma)^k}
+= \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau - (1+i\tau)x + (\gamma+\alpha)}
+\left(\frac{W_0((1+i\tau)/k; 1)}{W_0(1/k; 1)}\right)^{\!k}\dd\tau.
+\]
+Splitting $\tau \in \R$ at $T := 100 L$ and $4k$ for large $k$: on $|\tau| \le T$,
+Lemma~\ref{lem:W0-props}(iv) expresses the integrand as
+$e^{\Phi_\alpha(1+i\tau)-(1+i\tau)x}(1 + O(L^4/k))$, dominated by
+$O_{\alpha,x}(|e^{\Phi_\alpha(1+i\tau)}|) \in L^1(\R)$; on $T < |\tau| \le 4k$,
+Lemma~\ref{lem:W0-props}(ii),(iv) bound $|W_0((1+i\tau)/k; 1)/W_0(1/k; 1)|^k \ll L e^{-\pi T/2} \ll k^{-150}$;
+on $|\tau| > 4k$, Lemma~\ref{lem:W0-props}(iii) gives $\int_{|\tau|>4k} (5k/(2|\tau|))^k \dd\tau \ll k(5/8)^k$.
+Letting $k \to \infty$ gives $\nu_\alpha(x) \ge 0$ for all $x \in \R$ as the limit of the
+non-negative normalized convolution density on the left-hand side.
+
+Now set $p_\alpha(x) := e^x \nu_\alpha(x) \ge 0$ and fix $c \ge 1$. On $1 \le \re z \le c$,
+$\re\Phi_\alpha(u+i\tau) \sim -\frac{\pi}{2}|\tau|$ uniformly as $|\tau|\to\infty$, so Cauchy's theorem
+shifts the contour from $\re z = 1$ to $\re z = c$, giving
+\[
+f(x) := e^{(c-1)x} p_\alpha(x) = \frac{1}{2\pi}\int_{-\infty}^\infty g(\tau) e^{-i\tau x}\dd\tau,
+\qquad g(\tau) := e^{\Phi_\alpha(c+i\tau)}.
+\]
+Since $\Phi_\alpha'(z) = \gamma + \alpha + 1 + \log z$ and $\Phi_\alpha''(z) = 1/z$ satisfy
+$|\Phi_\alpha'(c+i\tau)| \ll_{c,\alpha} 1 + \log(1+|\tau|)$, $|\Phi_\alpha''(c+i\tau)| \le 1$, and
+$|g(\tau)| \ll_{c,\alpha} e^{-\pi|\tau|/4}$, we have $g, g', g'' \in L^1(\R_\tau)$ vanishing at
+$\pm\infty$. Integrating by parts twice yields $|f(x)| \le \frac{1}{2\pi}\min(\|g\|_{L^1}, x^{-2}\|g''\|_{L^1})$,
+so $0 \le f(x) \le C_{c,\alpha}/(1+x^2) \in L^1(\R)$. Fourier inversion on $L^1(\R)$ at $\tau=0$
+therefore gives $\int_{-\infty}^\infty p_\alpha(x)\dd x = e^{\gamma+\alpha}$ (at $c=1$) and
+$\int_{-\infty}^\infty e^{(c-1)x} p_\alpha(x)\dd x = e^{c(\gamma+\alpha+\log c)} \to +\infty$ as $c \to \infty$.
+If $p_\alpha$ vanished on $(0,\infty)$, the left-hand side would be $\le \int_{-\infty}^0 p_\alpha(x)\dd x \le e^{\gamma+\alpha}$
+for all $c > 1$, a contradiction. By real-analyticity, the zeros of $\nu_\alpha$ in $\R$ are discrete,
+so $\int_0^\infty \widetilde{Q}(x)^2 \nu_\alpha(x)\dd x > 0$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:uniqueness}]
+Set $\tilde{g} := c^{-1} g$, $\lambda := c^2 / m_0(g) > 0$, and $g^*(u) := \lambda \tilde{g}(\lambda u)$.
+
+\smallskip
+\noindent\textbf{Step 1: Normalization and scale invariance.}
+Changing variables $v = \lambda u$ yields $m_0(g^*) = \lambda m_0(\tilde{g}) = 1$, $g^* \in L^2 \cap L^4$,
+and by~(H2), $g^*(u) = u^{-1} + O_g(u^{-1-\delta})$ as $u \to \infty$. At $a = \lambda k\sigma$
+and $a' = k\sigma$, we have $g(a t_i) = \frac{m_0(g)}{c} g^*(a' t_i)$, so $(m_0(g)/c)^k$ cancels
+in $R_k(F_g) = k J(F_g)/I(F_g) = R_k(F_{g^*})$.
+
+\smallskip
+\noindent\textbf{Step 2: Inner-integral constant $\beta_*$ and Laplace representation.}
+Because $g^*, h \in L^2_{\mathrm{loc}}[0,\infty)$ and $g^*(u) - h(u) = O_g(u^{-1-\delta})$ at $\infty$,
+we have $g^* - h \in L^1(0,\infty)$ and set $\beta_* := \int_0^\infty (g^*(u) - h(u))\dd u$.
+Since $(g^*)^2 \in L^1 \cap L^2$, putting $W_{g^*}(\zeta) := \int_0^\infty g^*(u)^2 e^{-\zeta u}\dd u$
+($\re\zeta > 0$) gives $\omega \mapsto W_{g^*}((\sigma+i\omega)/a') \in L^2(\R)$ by Plancherel;
+setting $v_{Q,g^*}(y) := \int_0^y \widetilde{Q}(\sigma(y-t)) g^*(a' t)\dd t$ and applying
+Cauchy--Schwarz gives $|v_{Q,g^*}(y)| \le (\int_0^y \widetilde{Q}(\sigma(y-t))^2\dd t)^{1/2}\|g^*(a'\cdot)\|_{L^2}
+\ll_{Q, a'} (1+y)^{d+1/2}$ ($d = \deg\widetilde{Q}$), ensuring absolute
+integrability for $k \ge 3$ and exact Laplace representations (cf.\ \cite[Theorem~4]{Lewulis}):
+\begin{align*}
+I(F_{g^*}) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty} K_Q(s)\, W_{g^*}(s/a')^k (a')^{-k}\dd s, \\
+J(F_{g^*}) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty} e^s W_{g^*}(s/a')^{k-1}(a')^{-(k-1)} V_{Q,g^*}(s)\dd s,
+\end{align*}
+where $K_Q(s) = \int_0^1 \widetilde{Q}(\sigma(1-X))^2 e^{sX}\dd X$ and
+$V_{Q,g^*}(s) = \int_0^\infty \bigl(\int_0^y \widetilde{Q}(\sigma(y-t)) g^*(a' t)\dd t\bigr)^2 e^{-sy}\dd y$.
+In macro coordinates $x = \sigma y$, $u = k\sigma t$, $s = \sigma z$ ($z = 1+i\tau$),
+\[
+\sigma^3 k^2 V_{Q, g^*}(\sigma z)
+= \int_0^\infty \left(\int_0^{kx} \widetilde{Q}\!\left(x - \frac{u}{k}\right) g^*(u)\dd u\right)^{\!2} e^{-zx}\dd x.
+\]
+Expanding $\widetilde{Q}(x-u/k) = \widetilde{Q}(x) + \sum_{j=1}^d \frac{(-1)^j \widetilde{Q}^{(j)}(x)}{j! k^j} u^j$
+and writing $g^* = h + (g^* - h)$ yields
+\[
+\int_0^{kx} \widetilde{Q}\!\left(x - \frac{u}{k}\right) g^*(u)\dd u
+= L\,\widetilde{Q}(x) + \widetilde{Q}(x)(\log x + \beta_*) - (\cH\widetilde{Q})(x) + \widetilde{R}_k(x),
+\]
+where $(\cH\widetilde{Q})(x) := -\int_0^x \frac{\widetilde{Q}(x-w)-\widetilde{Q}(x)}{w}\dd w = \sum_{j=0}^d c_j \Harm_j x^j$
+for $\widetilde{Q}(x) = \sum_{j=0}^d c_j x^j$. Let us verify $\|\widetilde{R}_k\|_{L^2(e^{-x}\dd x)} \to 0$:
+\begin{itemize}
+\item The $h$-part of $\widetilde{R}_k$ is bounded in Lemma~\ref{lem:uniform-W-V}(ii) below
+(independently of Section~\ref{sec:uniqueness}) with $L^2(e^{-x}\dd x)$-norm $O_{\widetilde{Q}}(k^{-1/2})$.
+\item The tail $-\widetilde{Q}(x)\int_{kx}^\infty (g^*(u)-h(u))\dd u$ tends to $0$ pointwise and is
+dominated by $\|g^*-h\|_{L^1}|\widetilde{Q}(x)| \in L^2(e^{-x}\dd x)$.
+\item For each $1 \le j \le d$, choose $U \ge 1$ so $|g^*(u)-h(u)| \ll_g u^{-1-\delta'}$ for $u \ge U$,
+with $\delta' := \min(\delta, 1/2) \in (0, 1/2]$ (so $j - \delta' \ge 1/2$). For $k \ge U^2$ ($\sqrt{k} \ge U$),
+splitting $k^{-j}\int_0^{kx} u^j |g^*-h|\dd u$ at $\min(kx, \sqrt{k})$ gives $\le k^{-1/2}\|g^*-h\|_{L^1}$ on
+$[0, \min(kx, \sqrt{k})]$, while the second part on $[\min(kx, \sqrt{k}), kx]$ vanishes when $kx \le \sqrt{k}$
+and is $\ll_g k^{-j}\int_{\sqrt{k}}^{kx} u^{j-1-\delta'}\dd u \le \frac{x^{j-\delta'}}{(j-\delta')k^{\delta'}}$
+when $kx > \sqrt{k}$; both bounds are $o(1)$ in $L^2(e^{-x}\dd x)$.
+\end{itemize}
+Expanding the square against $e^{-zx}$ ($|e^{-zx}| = e^{-x}$) via Cauchy--Schwarz gives uniformly in $\tau \in \R$:
+\begin{equation}\label{eq:Vg-exp}
+\sigma^3 k^2 V_{Q, g^*}(\sigma z) = L^2 N_0(\tau) + 2L\bigl(N_1(\tau) + \beta_* N_0(\tau)\bigr) + o_{\widetilde{Q}, g}(L),
+\end{equation}
+with $N_0(\tau) := \int_0^\infty \widetilde{Q}(x)^2 e^{-zx}\dd x$ and
+$N_1(\tau) := \int_0^\infty \widetilde{Q}(x)\bigl(\widetilde{Q}(x)\log x - (\cH\widetilde{Q})(x)\bigr) e^{-zx}\dd x$,
+and in particular $\sigma^3 k^2 |V_{Q, g^*}(\sigma z)| \ll_{\widetilde{Q}, g} L^2$.
+
+\smallskip
+\noindent\textbf{Step 3: Uniform Laplace expansion of $W_{g^*}(\zeta)$.}
+With $U \ge 1$ from Step~2 and $\delta' := \min(\delta, 1/2) \in (0, 1/2]$,
+$\int_0^\infty u(g^*(u)-h(u))^2\dd u \le U\|g^*-h\|_{L^2}^2 + O_g(\int_U^\infty u^{-1-2\delta'}\dd u) < \infty$.
+Since $0 \le u h(u) \le 1$ and $g^*-h \in L^1$, the identity
+$u((g^*)^2 - h^2) = u(g^*-h)^2 + 2u h(u)(g^*-h)$ places $u((g^*)^2-h^2) \in L^1(0,\infty)$, so we may set
+\[
+c_1(g^*) := \gamma - \int_0^\infty u\bigl(g^*(u)^2 - h(u)^2\bigr)\dd u.
+\]
+Because $\int_0^\infty (g^*(u)^2 - h(u)^2)\dd u = m_0(g^*) - m_0(h) = 0$, for $\re\zeta > 0$ we have
+\[
+\frac{W_{g^*}(\zeta) - W_h(\zeta)}{\zeta} + \int_0^\infty u\bigl(g^*(u)^2 - h(u)^2\bigr)\dd u
+= \int_0^\infty \bigl(g^*(u)^2 - h(u)^2\bigr)\frac{e^{-\zeta u} - 1 + \zeta u}{\zeta}\dd u.
+\]
+Using $|e^{-w}-1| \le |w|$ and $|e^{-w}-1+w| \le |w|^2/2$ ($\re w \ge 0$), the kernel satisfies
+$|(e^{-\zeta u}-1+\zeta u)/\zeta| \le \min(2u, \frac{1}{2}|\zeta| u^2)$. Splitting at $u = |\zeta|^{-1/2}$
+against the integrable majorant $2u|(g^*)^2-h^2|$ makes the integral $o(1)$ uniformly as $|\zeta| \to 0$
+in $\{\re\zeta > 0\}$. Combined with $W_h(\zeta) = 1 + \zeta\log\zeta + \gamma\zeta + O(|\zeta|^2(1+|\log\zeta|))$
+(Lemma~\ref{lem:W0-props} below), we obtain
+\begin{equation}\label{eq:Wg-exp}
+W_{g^*}(\zeta) = 1 + \zeta\log\zeta + c_1(g^*)\zeta + r_g(\zeta),
+\qquad \sup_{\re\zeta > 0,\, |\zeta| \le r} \frac{|r_g(\zeta)|}{|\zeta|} \xrightarrow[r\to 0^+]{} 0.
+\end{equation}
+
+\smallskip
+\noindent\textbf{Step 4: Contour passage $k \to \infty$ and shift covariance.}
+Let $\zeta = (1+i\tau)/k$, $\zeta_0 = 1/k$, and split $\tau \in \R$ at $M \ge 16$ and $\delta_0 k$
+with $\delta_0 \in (0, e^{-3})$ sufficiently small.
+
+\emph{Region 1 ($|\tau| \le M$):} By~\eqref{eq:Wg-exp}, uniformly on $|\tau| \le M$,
+$k\log\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)} = i\tau(c_1(g^*)-L) + (1+i\tau)\log(1+i\tau) + o_M(1)$,
+so multiplying by $e^{i\sigma\tau} = e^{i(L+\alpha)\tau}$ gives
+\[
+e^{i\sigma\tau}\left(\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right)^{\!k}
+= e^{-(\gamma+\alpha')} e^{\Phi_{\alpha'}(1+i\tau)}\bigl(1 + o_M(1)\bigr),
+\qquad \alpha' := \alpha + c_1(g^*) - \gamma.
+\]
+
+\emph{Region 2 ($M < |\tau| \le \delta_0 k$):} Choose $M \ge 16$ so $\arctan M > 5/4$ and
+$\log(2t) \le \frac{1}{4} t$ ($t \ge M$). Write $\zeta = \rho e^{i\theta}$ ($\rho = \sqrt{1+\tau^2}/k \le 2\delta_0$,
+$\theta = \arctan\tau$), $W_{g^*}(\zeta) = 1 + X + i Y$, and $W_{g^*}(\zeta_0) = 1 + X_0$ where
+$X := \frac{\log\rho - \tau\theta + c_1(g^*)}{k} + \re r_g(\zeta)$,
+$X_0 := \frac{-L + c_1(g^*)}{k} + r_g(\zeta_0)$, and
+$Y := \frac{\tau\log\rho + \theta + c_1(g^*)\tau}{k} + \im r_g(\zeta)$.
+Put $\varepsilon(\delta_0) := \sup_{0 < |\zeta| \le 2\delta_0,\, \re\zeta > 0} |r_g(\zeta)|/|\zeta| \to 0^+$.
+Because $\log\rho + L \le \frac{1}{4}|\tau|$, $\tau\theta \ge \frac{5}{4}|\tau|$, and
+$|r_g(\zeta)| + |r_g(\zeta_0)| \le 3\varepsilon(\delta_0)|\tau|/k$, taking $\delta_0$ small enough
+that $\varepsilon(\delta_0) < 1/12$ gives $X - X_0 \le -\frac{3|\tau|}{4k}$, while
+$|\tau\theta|/k \le \frac{\pi}{2}\delta_0 < 0.08$ (for $\delta_0 < e^{-3}$),
+$|r_g(\zeta)|+|r_g(\zeta_0)| < \frac{1}{4}\delta_0$, and $\frac{|\log\rho|+L+2|c_1(g^*)|}{k} \to 0$
+yield $|X| + |X_0| < 1/4$ for sufficiently large $k$, so
+$(1+X)^2 - (1+X_0)^2 = (2+X+X_0)(X-X_0) \le -\frac{|\tau|}{k}$. Meanwhile, with
+$u := |\tau|/k \in (0,\delta_0]$ and $C_2 := |c_1(g^*)| + \frac{\pi}{2} + 1$,
+$|Y| \le \frac{2|\tau|\log(1/u) + C_2|\tau|}{k}$ implies
+$Y^2 \le \frac{|\tau|}{k}\bigl(8 u\log^2(1/u) + 2 C_2^2 u\bigr) < \frac{|\tau|}{4k}$
+once $\delta_0 \in (0, e^{-3})$ is chosen so $8\delta_0\log^2(1/\delta_0) + 2 C_2^2\delta_0 < 1/4$
+(since $u \mapsto u\log^2(1/u)$ increases on $(0, e^{-2})$). As $0 < W_{g^*}(\zeta_0) < 1$,
+\[
+\left|\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right|^2
+= \frac{(1+X)^2 + Y^2}{(1+X_0)^2} \le 1 - \frac{3|\tau|}{4k W_{g^*}(\zeta_0)^2} \le e^{-|\tau|/(2k)},
+\]
+whence $\bigl|W_{g^*}(\zeta)/W_{g^*}(\zeta_0)\bigr|^{k-1} \le e^{-(k-1)|\tau|/(4k)} \le e^{-|\tau|/8}$.
+
+\emph{Region 3 ($|\tau| > \delta_0 k$):} For $\omega = \tau/k$ ($|\omega| > \delta_0$), the
+Riemann--Lebesgue lemma implies that $\widehat{(g^*)^2}(\omega) = \int_0^\infty g^*(u)^2 e^{-i\omega u}\dd u$
+is continuous and vanishes at $\infty$, with $|\widehat{(g^*)^2}(\omega)| < 1$ for every $\omega \neq 0$ (equality would force $e^{-i\omega u}$
+to be constant a.e.\ on $\{g^* \neq 0\}$, which has positive measure while level sets of $e^{-i\omega u}$ are discrete
+cosets of $\frac{2\pi}{|\omega|}\mathbb{Z}$). Thus $\theta_1 := \sup_{|\omega| \ge \delta_0}|\widehat{(g^*)^2}(\omega)| < 1$.
+Since $W_{g^*}(1/k+i\omega) \to \widehat{(g^*)^2}(\omega)$ uniformly by dominated convergence and $W_{g^*}(1/k) \to 1$,
+there exists $\theta_0 \in (\theta_1, 1)$ with $|W_{g^*}(\zeta)/W_{g^*}(\zeta_0)| \le \theta_0$ for large $k$
+and $|\tau| > \delta_0 k$. By Plancherel, $\int_{-\infty}^\infty |W_{g^*}(1/k+i\omega)|^2\dd\omega \le 2\pi\|g^*\|_{L^4}^4$;
+since the squared inner integrands are non-negative, $|K_Q(\sigma z)| \le K_Q(\sigma) \ll e^\sigma/\sigma$
+and $\sigma^3 k^2 |V_{Q,g^*}(\sigma z)| \le \sigma^3 k^2 V_{Q,g^*}(\sigma) \ll L^2$; thus
+Region~3 contributes at most $O_{\widetilde{Q},g}(k)\,\theta_0^{k-3}$ to the normalized Bromwich integrals
+(after factoring out $e^\sigma W_{g^*}(1/k)^k (a')^{-k}$ from $I(F_{g^*})$ and
+$\frac{e^\sigma L^2}{\sigma W_{g^*}(1/k)} W_{g^*}(1/k)^k (a')^{-k}$ from $k J(F_{g^*})$, and likewise in $A_k, A_k', B_k$).
+
+To pass to the limit cleanly in the $L^2$-scaled numerator, keep the contour factor unexpanded until after
+division: for $k \ge 4$, define
+\[
+A_k := \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau}\!\left(\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right)^{\!k} N_0(\tau)\dd\tau,
+\quad
+A_k' := \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau}\!\left(\frac{W_{g^*}(\zeta)}{W_{g^*}(\zeta_0)}\right)^{\!k-1} N_0(\tau)\dd\tau,
+\]
+and $B_k := \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\sigma\tau}(W_{g^*}(\zeta)/W_{g^*}(\zeta_0))^{k-1}(N_1(\tau) + \beta_* N_0(\tau))\dd\tau$.
+By~\eqref{eq:Phi-abs}, Region~2's $e^{-|\tau|/8}$, Region~3's $O(k\theta_0^{k-3})$, and Region~1 on $|\tau| \le M(\varepsilon)$
+($M(\varepsilon) \to \infty$ as $\varepsilon \to 0^+$), letting $k \to \infty$ gives
+\[
+A_k \to e^{-(\gamma+\alpha')}\mathcal{I}_\infty(\alpha'),
+\qquad
+B_k \to e^{-(\gamma+\alpha')}\bigl(\mathcal{M}_\infty(\alpha') + \beta_*\mathcal{I}_\infty(\alpha')\bigr),
+\]
+where $\mathcal{I}_\infty(\alpha') := \int_0^\infty \widetilde{Q}(x)^2 \nu_{\alpha'}(x)\dd x > 0$ (Lemma~\ref{lem:nu-pos})
+and $\mathcal{M}_\infty(\alpha') := \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_{\alpha'}(1+i\tau)} N_1(\tau)\dd\tau$.
+In particular, $A_k$ is bounded away from $0$ for large $k$. Moreover, on $|\tau| \le \delta_0 k$, \eqref{eq:Wg-exp}
+yields $|1 - W_{g^*}(\zeta)/W_{g^*}(\zeta_0)| \ll_g \frac{L(1+|\tau|)}{k}$; integrating against $|W_{g^*}(\zeta)/W_{g^*}(\zeta_0)|^{k-1}|N_0(\tau)|$
+across $|\tau| \le 16$, $16 < |\tau| \le \delta_0 k$ (taking $M = 16$ in Region~2), and $|\tau| > \delta_0 k$ yields $|A_k' - A_k| \ll_{\widetilde{Q},g} L/k$.
+
+Inserting $\sigma e^{-\sigma z} K_Q(\sigma z) = N_0(\tau) + O(L^{2d}/k)$ (Lemma~\ref{lem:uniform-W-V}(iii)) and~\eqref{eq:Vg-exp}
+into the Bromwich integrals (using $\int_{-\infty}^\infty |W_{g^*}(\zeta)/W_{g^*}(\zeta_0)|^{k-1}\dd\tau \ll_g 1$) gives
+\begin{align*}
+I(F_{g^*}) &= e^\sigma W_{g^*}(1/k)^k (a')^{-k} \bigl(A_k + O(L^{2d}/k)\bigr), \\
+k J(F_{g^*}) &= \frac{e^\sigma}{\sigma W_{g^*}(1/k)} W_{g^*}(1/k)^k (a')^{-k} \bigl(L^2 A_k + 2L B_k + o(L)\bigr),
+\end{align*}
+since $L^2 A_k' = L^2 A_k + O(L^3/k)$. Using $(A_k + O(L^{2d}/k))^{-1} = A_k^{-1}(1 + O(L^{2d}/k))$ and
+$W_{g^*}(1/k) = 1 + O_g(L/k)$, dividing yields
+\[
+R_k(F_{g^*}) = \frac{L^2}{\sigma} + \frac{2 B_k}{A_k} + o(1)
+= \log k + \bigl(2\beta_* + c_1(g^*) - \gamma\bigr) + \eta(h; \alpha', \widetilde{Q}) + o(1),
+\]
+where $\eta(h; \alpha', \widetilde{Q}) = -\alpha' + 2\mathcal{M}_\infty(\alpha')/\mathcal{I}_\infty(\alpha')$.
+Taking the supremum over $\alpha \in \R$ yields~\eqref{eq:shift-covariance} with $\kappa(g^*) - \gamma := 2\beta_* + c_1(g^*) - \gamma$.
+
+\smallskip
+\noindent\textbf{Step 5: Algebraic completion.}
+Using $(1+u)h(u) = 1$ ($u \ge 0$) and $\int_0^\infty (g^*(u)^2 - h(u)^2)\dd u = 0$,
+\begin{align*}
+-\int_0^\infty (1+u)\bigl(g^*(u) - h(u)\bigr)^2 \dd u
+&= -\int_0^\infty u\bigl(g^*(u)^2 - h(u)^2\bigr)\dd u + 2\int_0^\infty \bigl(g^*(u) - h(u)\bigr)\dd u \\
+&= \bigl(c_1(g^*) - \gamma\bigr) + 2\beta_* = \kappa(g^*) - \gamma \le 0.
+\end{align*}
+Since $1+u \ge 1 > 0$, equality holds if and only if $g^*(u) = h(u)$ a.e.\ on $(0,\infty)$,
+equivalently $g(u) = C/(1+\theta u)$ a.e.\ with $C = m_0(g)/c$ and $\theta = m_0(g)/c^2 > 0$.
+\end{proof}
+
+\begin{remark}[Scale choice, stability, and scope]
+Rescaling $a' = \mu k\sigma$ ($\mu > 0$) in~\eqref{eq:Wg-exp} yields
+$k\log\bigl(W_{g^*}(\sigma(1+i\tau)/a')/W_{g^*}(\sigma/a')\bigr) = -\frac{i\tau}{\mu}\log k + O(1)$,
+which cancels $e^{i\sigma\tau}$ precisely when $\mu = 1$. Quantitative stability also follows directly
+from~\eqref{eq:shift-covariance}--\eqref{eq:kappa-penalty}: any kernel $g$ coming within $\varepsilon > 0$
+of the optimal radial shifted limit satisfies $\|g^* - h\|_{L^2((1+u)\dd u)} \le \sqrt{\varepsilon}$.
+Theorem~\ref{thm:uniqueness} applies strictly to product kernels~\eqref{eq:Fg-def} with radial polynomials;
+Theorem~\ref{thm:main} escapes this radial barrier via the non-radial power-sum ansatz~\eqref{eq:ansatz-C}.
+\end{remark}
+
+\section{Exact Finite-\texorpdfstring{$k$}{k} Laplace Reduction for the \texorpdfstring{$\Lambda_W$}{Lambda\_W} Family}\label{sec:laplace}
+
+Let $\Lambda_W$ ($W \ge 0$) be the set of all partitions $\lambda = (\lambda_1,\dots,\lambda_{\ell(\lambda)})$
+with $\lambda_1 \ge \cdots \ge \lambda_{\ell(\lambda)} \ge 2$ and $|\lambda| \le W$ (including $()$); note
+$\ell(\lambda) \le \lfloor W/2 \rfloor$ ($\le 4$ for $W=9$). For parameters $a, \sigma > 0$ and polynomials
+$Q_\lambda(y) := \widetilde{Q}_\lambda(\sigma y)$, set $g(t) := (1+at)^{-1}$, $w(t) := g(t)^2$, and
+\begin{equation}\label{eq:F-LambdaW}
+F(t_1,\dots,t_k) := \left[\sum_{\lambda \in \Lambda_W} Q_\lambda(1 - P_1)
+\prod_{j=1}^{\ell(\lambda)} \bigl(\sigma^{\lambda_j} P_{\lambda_j}\bigr)\right]
+\prod_{i=1}^k g(t_i).
+\end{equation}
+For $\re s > 0$ and integers $m \ge 0$, define
+\begin{equation}\label{eq:Wm-E-def}
+W_m(s; a) := \int_0^\infty \frac{t^m e^{-st}}{(1+at)^2}\dd t,
+\qquad
+E(s; a) := \int_0^\infty \frac{e^{-st}}{1+at}\dd t.
+\end{equation}
+
+\begin{lemma}[Partial-Fraction Representation and Decay of $W_m$]\label{lem:Wm-pf}
+Let $a > 0$ and $\re s > 0$.
+\begin{enumerate}
+\item[(i)] $W_0(s;a) = \frac{1}{a} - \frac{s}{a} E(s;a)$, and for every integer $m \ge 2$,
+\begin{equation}\label{eq:Wm-pf}
+W_m(s;a) = \frac{1}{a^m}\left(\sum_{r=0}^{m-2} (-1)^{m-r}(m-1-r)\frac{r!\,a^r}{s^{r+1}}
+- (-1)^m m\, E(s;a) + (-1)^m W_0(s;a)\right).
+\end{equation}
+\item[(ii)] For every $m \ge 0$ and fixed $\sigma > 0$, $|W_m(\sigma + i\omega; a)| \ll_{m,a,\sigma} (1 + |\omega|)^{-1}$
+uniformly in $\omega \in \R$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Integration by parts gives $W_0(s;a) = \frac{1}{a} - \frac{s}{a} E(s;a)$. For $m \ge 2$, substituting $x = a t$
+into the exact polynomial identity
+\[
+x^m = (1+x)^2 \sum_{r=0}^{m-2} (-1)^{m-r}(m-1-r) x^r - (-1)^m m(1+x) + (-1)^m
+\]
+(verified directly by comparing coefficients of $x^j$ for $0 \le j \le m$) and dividing by $(1+x)^2$ against
+$a^{-m-1} e^{-(s/a)x}\dd x$ yields~\eqref{eq:Wm-pf}, using $\int_0^\infty x^r e^{-(s/a)x}\dd x = r!(a/s)^{r+1}$.
+Part~(ii) follows by integrating~\eqref{eq:Wm-E-def} by parts once against $e^{-i\omega t}$, since
+$t \mapsto t^m (1+at)^{-2} e^{-\sigma t} \in C^1[0,\infty) \cap L^1(0,\infty)$ has integrable derivative
+vanishing at $\infty$.
+\end{proof}
+
+For any tuple $\xi = (\xi_1, \dots, \xi_n)$ of parts $\ge 2$, let $\Pi([n])$ be the set of set partitions
+$\pi$ of $[n] := \{1,\dots,n\}$ ($\Pi(\emptyset) = \{\emptyset\}$), put $s_\xi(B) := \sum_{j \in B} \xi_j$
+for each block $B \in \pi$, let $(k)_t := k(k-1)\cdots(k-t+1)$ ($(k)_0 := 1$), and define
+\begin{equation}\label{eq:Gk-def}
+\cG_k(s; \xi) := \sum_{\substack{\pi \in \Pi([\ell(\xi)]) \\ |\pi| \le k}} (k)_{|\pi|}\,
+W_0(s; a)^{k - |\pi|} \prod_{B \in \pi} W_{s_\xi(B)}(s; a)
+\end{equation}
+(where summands with $|\pi| > k$ vanish identically due to the falling factorial $(k)_{|\pi|} = 0$,
+avoiding formal negative powers of $W_0$ when $k$ is small).
+For $\lambda \in \Lambda_W$ and $S \subseteq [\ell(\lambda)]$, write $s_\lambda(S) := \sum_{j \in S} \lambda_j$,
+and let $\lambda_{\setminus S} \in \Lambda_W$ be the partition obtained by removing indices in $S$.
+
+\begin{proposition}[Exact Finite-$k$ Set-Partition Laplace Formulas]\label{prop:exact-laplace}
+Fix $W \ge 0$, $k \ge 3$, $a, \sigma > 0$, and polynomials $\{Q_\lambda\}_{\lambda \in \Lambda_W}$.
+Define $K_{\lambda_1,\lambda_2}(s) := \int_0^1 Q_{\lambda_1}(1-X) Q_{\lambda_2}(1-X) e^{sX}\dd X$ and
+\begin{equation}\label{eq:v-eff-def}
+v_\mu^{\mathrm{eff}}(y) := \int_0^y \frac{Q_\mu(y-t)}{1+at}\dd t
++ \sum_{\lambda \in \Lambda_W}\sum_{\substack{\emptyset \neq S \subseteq [\ell(\lambda)] \\ \lambda_{\setminus S} = \mu}}
+\sigma^{s_\lambda(S)} \int_0^y \frac{Q_\lambda(y-t)\, t^{s_\lambda(S)}}{1+at}\dd t,
+\end{equation}
+with $V_{\mu_1,\mu_2}^{\mathrm{eff}}(s) := \int_0^\infty v_{\mu_1}^{\mathrm{eff}}(y) v_{\mu_2}^{\mathrm{eff}}(y) e^{-sy}\dd y$.
+Then
+\begin{align}
+I(F) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty}
+\sum_{\lambda_1,\lambda_2 \in \Lambda_W} K_{\lambda_1,\lambda_2}(s)\,
+\sigma^{|\lambda_1|+|\lambda_2|} \, \cG_k(s; \lambda_1 \sqcup \lambda_2)\dd s,
+\label{eq:I-exact-laplace}\\
+J(F) &= \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty}
+e^s \sum_{\mu_1,\mu_2 \in \Lambda_W} V_{\mu_1,\mu_2}^{\mathrm{eff}}(s)\,
+\sigma^{|\mu_1|+|\mu_2|} \, \cG_{k-1}(s; \mu_1 \sqcup \mu_2)\dd s,
+\label{eq:J-exact-laplace}
+\end{align}
+where $\lambda_1 \sqcup \lambda_2$ denotes concatenation and both vertical integrals converge absolutely.
+\end{proposition}
+
+\begin{proof}
+Expanding $\prod_{j=1}^n P_{\xi_j}(t) = \sum_{i_1,\dots,i_n \in [k]} \prod_{j=1}^n t_{i_j}^{\xi_j}$
+according to the equality partition $\pi \in \Pi([n])$ of indices $(i_1,\dots,i_n)$, there are
+$(k)_{|\pi|}$ injective assignments of the $|\pi|$ blocks to $[k]$ (vanishing when $|\pi| > k$).
+Multiplying by $\prod_{i=1}^k w(t_i) e^{-s t_i}$ and integrating over $[0,\infty)^k$ gives $\cG_k(s; \xi)$
+as the Laplace transform of the hyperplane integral
+\[
+\Psi_k(X; \xi) := \int_{\substack{t_1,\dots,t_k \ge 0 \\ t_1+\cdots+t_k = X}}
+\left(\prod_{j=1}^n P_{\xi_j}(t)\right) \prod_{i=1}^k w(t_i)\dd m_{k-1},
+\]
+where $\dd m_{k-1} := \dd t_1\cdots\dd t_{k-1}$ denotes the projected $(k-1)$-dimensional Lebesgue
+measure normalized by $\dd X \dd m_{k-1} = \dd t_1\cdots\dd t_k$ (with $t_k = X - \sum_{i=1}^{k-1} t_i$).
+By Lemma~\ref{lem:Wm-pf}(ii), each non-vanishing term ($|\pi| \le k$) in~\eqref{eq:Gk-def} is
+a product of $k \ge 3$ factors $W_m$, hence $O((1+|\omega|)^{-k}) \in L^1(\R_\omega)$. Since $\Psi_k(X;\xi) = 0$
+for $X < 0$ and the inversion integral is continuous on $\R$ (so $\Psi_k(0;\xi) = 0$), Fourier/Laplace inversion
+gives $\Psi_k(X;\xi) = \frac{1}{2\pi i}\int_{\sigma-i\infty}^{\sigma+i\infty} e^{sX}\cG_k(s;\xi)\dd s$ for all $X \in \R$.
+Integrating against $Q_{\lambda_1}(1-X) Q_{\lambda_2}(1-X)$ over $X \in [0,1]$ and applying Fubini yields~\eqref{eq:I-exact-laplace}.
+
+For $J(F)$, setting $X := \sum_{i=1}^{k-1} t_i$, $y := 1 - X$, and $P_r' := \sum_{i=1}^{k-1} t_i^r$
+($P_r = P_r' + t_k^r$), binomial expansion of $\prod_{j=1}^{\ell(\lambda)} (P_{\lambda_j}' + t_k^{\lambda_j})$
+over subsets $S \subseteq [\ell(\lambda)]$ collects the inner $t_k$-integral as
+$v(t_1,\dots,t_{k-1}) = \sum_{\mu \in \Lambda_W} \bigl(\prod_{r=1}^{\ell(\mu)} \sigma^{\mu_r} P_{\mu_r}'\bigr) v_\mu^{\mathrm{eff}}(y)$.
+Squaring and integrating over $t_1 + \cdots + t_{k-1} = X \in [0,1]$ gives
+$J(F) = \int_0^1 \sum_{\mu_1,\mu_2} v_{\mu_1}^{\mathrm{eff}}(1-X) v_{\mu_2}^{\mathrm{eff}}(1-X)
+\sigma^{|\mu_1|+|\mu_2|} \Psi_{k-1}(X; \mu_1\sqcup\mu_2)\dd X$.
+Since $v_\mu^{\mathrm{eff}}(y)$ has polynomial growth and vanishes at $0$, $V_{\mu_1,\mu_2}^{\mathrm{eff}}(\sigma+i\omega) \ll (1+|\omega|)^{-1}$,
+while $|\cG_{k-1}(\sigma+i\omega;\xi)| \ll (1+|\omega|)^{-(k-1)} \le (1+|\omega|)^{-2}$, which belongs to
+$L^1(\R_\omega)$ since $k - 1 \ge 2$.
+Because $\Psi_{k-1}(1-y;\xi) = 0$ for $y > 1$, substituting $X = 1-y$ extends $\int_0^1$ to $\int_0^\infty$, and Fubini's theorem yields~\eqref{eq:J-exact-laplace}.
+\end{proof}
+
+\section{Proof of the Asymptotic Limit (\texorpdfstring{$k \to \infty$}{k -> infinity})}\label{sec:asymptotic}
+
+Specialize Proposition~\ref{prop:exact-laplace} to $\alpha \in \R$, $L = \log k$, $\sigma = L+\alpha$,
+$a = k\sigma$ (for $k \ge \max(20, 2\lfloor W/2\rfloor + 2)$ with $\sigma > 0$), fixed $\{\widetilde{Q}_\lambda\}_{\lambda\in\Lambda_W}$
+of degrees $d_\lambda$, and contour $s = \sigma z$ ($z = 1+i\tau$, $\zeta = s/a = (1+i\tau)/k$, $\zeta_0 = 1/k$).
+
+\begin{lemma}[Self-Contained Properties of $W_0$]\label{lem:W0-props}
+Fix $a, \sigma > 0$.
+\begin{enumerate}
+\item[(i)] $W_0(z; a) = a^{-1} W_0(z/a; 1)$ for $\re z > 0$, and $W_0(\zeta; 1) = 1 - \zeta e^\zeta E_1(\zeta)$
+where $E_1(\zeta) := \int_\zeta^\infty t^{-1} e^{-t}\dd t$.
+\item[(ii)] $\omega \mapsto |W_0(\sigma + i\omega; a)|$ is even and strictly decreasing on $[0,\infty)$ (cf.\ \cite[Lemma~5]{Lewulis}).
+\item[(iii)] Whenever $0 < \zeta_0 := \re\zeta \le 1/20$, $|W_0(\zeta;1)/W_0(\zeta_0;1)| \le \frac{5}{2|\zeta|}$ (cf.\ \cite[Lemma~6]{Lewulis}).
+\item[(iv)] For $|\tau| \le T := 100 L$ and sufficiently large $k$, $W_0(1/k;1) = 1 + O(L/k)$ and
+\begin{equation}\label{eq:W0-log-exp}
+k \log\frac{W_0(\zeta;1)}{W_0(\zeta_0;1)} = i\tau(\gamma - L) + (1+i\tau)\log(1+i\tau) + \Delta_k(\tau),
+\qquad |\Delta_k(\tau)| \ll \frac{L^2(1+\tau^2)}{k}.
+\end{equation}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Part~(i) follows by $u = a t$, integration by parts, and $w = \zeta(1+t)$.
+For~(ii), evenness holds by conjugation. Writing $s = \sigma + i\omega$, Lemma~\ref{lem:Wm-pf}(i) gives
+$W_0(s;a) = \frac{1}{a} - \frac{s}{a}E(s;a)$; rotating $u = st$ onto $[0,\infty)$ in $E(s;a)$ yields
+$W_0(s;a) = \frac{s}{a}\int_0^\infty (\frac{1}{s} - \frac{1}{s+au})e^{-u}\dd u = \int_0^\infty \frac{u e^{-u}}{r_u + i\omega}\dd u$
+($r_u := \sigma + a u > 0$; in particular $\re W_0 > 0$).
+Symmetrizing over $(u,v) \in (0,\infty)^2$ cancels $\pm i\omega(r_u - r_v)$:
+\[
+|W_0(\sigma+i\omega; a)|^2
+= \int_0^\infty\!\!\int_0^\infty \frac{u v e^{-u-v}}{r_u + r_v}
+\left(\frac{r_u}{r_u^2+\omega^2} + \frac{r_v}{r_v^2+\omega^2}\right)\dd u\dd v,
+\]
+whose $\omega$-derivative is strictly negative for $\omega > 0$.
+
+For~(iii), opposite integration by parts yields $W_0(\zeta;1) = \frac{1}{\zeta} - \frac{2}{\zeta}\int_0^\infty \frac{e^{-\zeta t}}{(1+t)^3}\dd t$,
+so $|W_0(\zeta;1)| \le \frac{2}{|\zeta|}$. On $\zeta_0 \in (0, 1/20]$,
+$E_1(\zeta_0) \le \log(\zeta_0^{-1}) + e^{-1}$, and $\zeta_0 \mapsto \zeta_0 e^{\zeta_0}(\log(\zeta_0^{-1})+e^{-1})$
+increases on $(0, 1/20]$ (derivative $e^{\zeta_0}((1+\zeta_0)(\log(\zeta_0^{-1})+e^{-1}) - 1) > 0$), giving
+$W_0(\zeta_0;1) \ge 1 - \frac{1}{20}e^{1/20}(\log 20 + e^{-1}) > 4/5$, hence the claim.
+
+For~(iv), $E_1(\zeta) = -\gamma - \log\zeta - \sum_{n\ge 1} \frac{(-\zeta)^n}{n\cdot n!}$ implies
+$\log W_0(\zeta;1) = \zeta(\gamma + \log\zeta) + O(|\zeta|^2(1+|\log\zeta|)^2)$ for $|\zeta| \le c_0$
+(with $c_0 > 0$ a sufficiently small absolute constant ensuring $|W_0(\zeta;1) - 1| \le 1/2$).
+Evaluating at $\zeta = (1+i\tau)/k$ ($|\tau| \le T$) and subtracting $\zeta_0 = 1/k$ yields~\eqref{eq:W0-log-exp}.
+\end{proof}
+
+\begin{lemma}[Uniform Moment and Inner-Integral Estimates]\label{lem:uniform-W-V}
+Let $\sigma = L + \alpha$, $a = k\sigma$, and $z = 1+i\tau$ ($\tau \in \R$).
+\begin{enumerate}
+\item[(i)] For every integer $m \ge 2$ and uniformly over all $\tau \in \R$,
+\begin{equation}\label{eq:Wm-uniform}
+k \sigma^m \frac{W_m(\sigma z; k\sigma)}{W_0(\sigma; k\sigma)} = \frac{(m-2)!}{z^{m-1}} + O_m\!\left(\frac{L}{k}\right).
+\end{equation}
+\item[(ii)] Define $(\cH\widetilde{Q})(x) := -\int_0^x \frac{\widetilde{Q}(x-u)-\widetilde{Q}(x)}{u}\dd u$,
+$(B_{s-1}\widetilde{Q})(x) := \int_0^x \widetilde{Q}(x-u) u^{s-1}\dd u$ ($s \ge 2$), and
+\[
+G_\mu(x) := \widetilde{Q}_\mu(x)\log x - (\cH\widetilde{Q}_\mu)(x)
++ \sum_{\lambda\in\Lambda_W}\sum_{\substack{\emptyset\neq S\subseteq[\ell(\lambda)] \\ \lambda_{\setminus S}=\mu}}
+\bigl(B_{s_\lambda(S)-1}\widetilde{Q}_\lambda\bigr)(x).
+\]
+Then uniformly over all $\tau \in \R$,
+\begin{equation}\label{eq:V-uniform}
+\sigma^3 k^2 V_{\mu_1,\mu_2}^{\mathrm{eff}}(\sigma z; k\sigma)
+= L^2 N_{\mu_1,\mu_2}^{(0)}(\tau)
++ L\bigl(N_{\mu_1,\mu_2}^{(1)}(\tau) + N_{\mu_2,\mu_1}^{(1)}(\tau)\bigr)
++ N_{\mu_1,\mu_2}^{(2)}(\tau) + O\!\left(\frac{L^2}{k}\right),
+\end{equation}
+where $N_{\mu_1,\mu_2}^{(0)}(\tau) := \int_0^\infty \widetilde{Q}_{\mu_1}\widetilde{Q}_{\mu_2} e^{-zx}\dd x$,
+$N_{\mu_1,\mu_2}^{(1)}(\tau) := \int_0^\infty \widetilde{Q}_{\mu_1} G_{\mu_2} e^{-zx}\dd x$, and
+$N_{\mu_1,\mu_2}^{(2)}(\tau) := \int_0^\infty G_{\mu_1} G_{\mu_2} e^{-zx}\dd x$ are uniformly $O(1)$ in $\tau \in \R$.
+\item[(iii)] Uniformly over $\tau \in \R$, $\sigma e^{-\sigma z} K_{\lambda_1,\lambda_2}(\sigma z)
+= N_{\lambda_1,\lambda_2}^{(0)}(\tau) + O(L^{d_{\lambda_1}+d_{\lambda_2}}/k)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+For~(i), substituting $w = \sigma t$ expresses the ratio as
+$\frac{1}{W_0(1/k;1)}\int_0^\infty \frac{k^2 w^m}{(1+kw)^2} e^{-zw}\dd w$.
+Since $0 \le w^{m-2} - \frac{k^2 w^m}{(1+kw)^2} = w^{m-2}\frac{2kw+1}{(1+kw)^2}$ and $|e^{-zw}| = e^{-w}$,
+splitting at $w=1$ when $m=2$ bounds the difference against $\int_0^\infty w^{m-2}e^{-zw}\dd w = \frac{(m-2)!}{z^{m-1}}$
+by $O(L/k)$, while for $m \ge 3$ using $w\frac{2kw+1}{(1+kw)^2} \le \frac{2}{k}$ yields $O_m(1/k)$. Dividing
+by $W_0(1/k;1) = 1 + O(L/k)$ gives~\eqref{eq:Wm-uniform}.
+
+For~(ii), putting $x = \sigma y$ and $u = \sigma t$ in~\eqref{eq:v-eff-def} and expanding $\widetilde{Q}_\mu(x-u)$
+via $\int_0^x \frac{\dd u}{u+1/k} = L + \log x + \log(1 + \frac{1}{kx})$ and
+$\int_0^x \frac{u^j\dd u}{u+1/k} = \frac{x^j}{j} - \frac{1}{k}\int_0^x \frac{u^{j-1}\dd u}{u+1/k}$ gives
+$\sigma k v_\mu^{\mathrm{eff}}(x/\sigma) = L \widetilde{Q}_\mu(x) + G_\mu(x) + E_{k,\mu}(x)$, where
+$E_{k,\mu}$ combines $R_{1,k}^{\mu,(0)}(x) := \widetilde{Q}_\mu(x)\log(1 + \frac{1}{kx})$,
+$R_{1,k}^{\mu,(1)}(x) := -\sum_{j=1}^{d_\mu} \frac{(-1)^j \widetilde{Q}_\mu^{(j)}(x)}{j!\, k}\int_0^x \frac{u^{j-1}\dd u}{u+1/k}$,
+and the shift remainders $R_{2,k}^{\lambda,S}$ bounded in modulus by $\frac{1}{k}\int_0^x |\widetilde{Q}_\lambda(x-u)|u^{s-2}\dd u \ll (1+x^{d_\lambda+s-1})/k$.
+Set $d_{\max} := \max_\lambda (d_\lambda + |\lambda|)$. For $R_{1,k}^{\mu,(1)}$, since
+$\int_0^x \frac{u^{j-1}\dd u}{u+1/k}$ equals $\log(kx+1) \ll L + \log(1+x)$ for $j=1$ and at most
+$x^{j-1}/(j-1)$ for $j \ge 2$, we have $|R_{1,k}^{\mu,(1)}(x)| \ll (1+x^{d_{\max}})\frac{L+\log(1+x)}{k}$,
+contributing $O(L/k)$ in $L^1$ and $L^2$ and $O(L^2/k)$ against $A_{k,\mu}$. Splitting $(0,\infty)$
+at $1/k$ and $1$ for $R_{1,k}^{\mu,(0)}$, substituting $v = kx$ on $(0, 1/k]$ gives
+$\int_0^{1/k} (1+x^{d_{\max}})\log^r(1+\frac{1}{kx})e^{-x}\dd x \ll 1/k$ ($r = 1,2$),
+while $\log(1+\frac{1}{kx}) \le \frac{1}{kx}$ on $(1/k,\infty)$ yields
+$\int_{1/k}^\infty (1+x^{d_{\max}})\log^r(1+\frac{1}{kx})e^{-x}\dd x \ll L/k$ ($r = 1$) and $O(1/k)$ ($r = 2$),
+whence $\|E_{k,\mu}\|_{L^1(e^{-x}\dd x)} \ll L/k$ and $\|E_{k,\mu}\|_{L^2(e^{-x}\dd x)} \ll k^{-1/2}$.
+For cross terms with $A_{k,\mu} := L\widetilde{Q}_\mu + G_\mu$ (where $|A_{k,\mu}(x)| \ll (1+x^{d_{\max}})(L + |\log x|)$),
+integrating over $(0, 1/k] \cup (1/k, 1] \cup (1,\infty)$ bounds every piece by $O(L^2/k)$, proving~\eqref{eq:V-uniform}.
+
+For~(iii), substituting $x = \sigma(1-X)$ turns $\sigma e^{-\sigma z} K_{\lambda_1,\lambda_2}(\sigma z)$ into
+$N_{\lambda_1,\lambda_2}^{(0)}(\tau) - \int_\sigma^\infty \widetilde{Q}_{\lambda_1}\widetilde{Q}_{\lambda_2} e^{-zx}\dd x$,
+with tail $\ll \sigma^{d_{\lambda_1}+d_{\lambda_2}} e^{-\sigma} \ll L^{d_{\lambda_1}+d_{\lambda_2}}/k$.
+\end{proof}
+
+For any tuple $\xi = (\xi_1,\dots,\xi_n)$ of parts $\ge 2$, define the Poisson-point-process (PPP) weight
+\begin{equation}\label{eq:WPPP-def}
+W_\xi^{\mathrm{PPP}}(z) := \sum_{\pi \in \Pi([n])} \prod_{B \in \pi}
+\frac{(s_\xi(B)-2)!}{z^{s_\xi(B)-1}} =: \sum_{r \ge 0} w_{\xi, r} z^{-r},
+\end{equation}
+noting $w_{(),0} = 1$, $w_{\xi, r} > 0$ iff $|\xi| - n \le r \le |\xi| - 1$ ($n \ge 1$), and
+$|W_\xi^{\mathrm{PPP}}(1+i\tau)| \le W_\xi^{\mathrm{PPP}}(1)$.
+
+\begin{proposition}[Asymptotic Contour Limit]\label{prop:contour-limit}
+Let $F$ be given by~\eqref{eq:F-LambdaW} at $a = k\sigma$ ($\sigma = L+\alpha$). Define
+\begin{align}
+\mathcal{I}_\infty(\alpha) &:= \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau)}
+\sum_{\lambda_1,\lambda_2 \in \Lambda_W} W_{\lambda_1\sqcup\lambda_2}^{\mathrm{PPP}}(1+i\tau)\, N_{\lambda_1,\lambda_2}^{(0)}(\tau)\dd\tau, \label{eq:I-inf-def}\\
+\mathcal{M}_\infty(\alpha) &:= \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau)}
+\sum_{\mu_1,\mu_2 \in \Lambda_W} W_{\mu_1\sqcup\mu_2}^{\mathrm{PPP}}(1+i\tau)\, N_{\mu_1,\mu_2}^{(1)}(\tau)\dd\tau. \label{eq:M-inf-def}
+\end{align}
+If $\mathcal{I}_\infty(\alpha) > 0$, then as $k \to \infty$,
+\begin{equation}\label{eq:quotient-limit}
+R_k(F) = L + \left(\frac{2\mathcal{M}_\infty(\alpha)}{\mathcal{I}_\infty(\alpha)} - \alpha\right) + O\!\left(\frac{1}{L}\right).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Write $I(F) = e^\sigma W_0(\sigma; a)^k Z_{I,k}$ and $J(F) = \frac{e^\sigma W_0(\sigma; a)^{k-1}}{\sigma^2 k^2} Z_{J,k}$
+in~\eqref{eq:I-exact-laplace}--\eqref{eq:J-exact-laplace}, with $s = \sigma z$ ($z = 1+i\tau$) and
+$\widehat{\cG}_n(\sigma z;\xi) := \cG_n(\sigma z;\xi)/W_0(\sigma;a)^n$ ($n \in \{k, k-1\}$). Split $\tau \in \R$
+at $T := 100 L$ and $4k$, and set $p_{\max} := 2\lfloor W/2\rfloor$ ($\le 8$ for $W=9$).
+
+On $|\tau| > T$, $|W_m(\sigma z; a)| \le W_m(\sigma; a)$, $|K_{\lambda_1,\lambda_2}(\sigma z)| \ll e^\sigma/\sigma$,
+$|V_{\mu_1,\mu_2}^{\mathrm{eff}}(\sigma z; a)| \ll L^2/(\sigma^3 k^2)$, and by Lemma~\ref{lem:uniform-W-V}(i)
+each block satisfies $k\sigma^{s_\xi(B)}|W_{s_\xi(B)}|/W_0(\sigma;a) \ll 1$. Because $(n)_{|\pi|}/k^{|\pi|} \le 1$
+and $n - |\pi| \ge k - 1 - p_{\max}$ ($\ge k-9$ for $W=9$), the integrands are bounded by
+$O(L^2)|W_0(\sigma z;a)/W_0(\sigma;a)|^{k-1-p_{\max}}$. By Lemma~\ref{lem:W0-props}(ii),(iv), on $T < |\tau| \le 4k$
+this is $\ll L^3 e^{-\pi T/2} \ll k^{-150}$ (integrating to $O(k^{-148})$), and on $|\tau| > 4k$ Lemma~\ref{lem:W0-props}(iii)
+gives $\ll L^2 k (5/8)^{k-1-p_{\max}}$.
+
+On $|\tau| \le T$, $W_0(\sigma z;a) \neq 0$, $(n)_{|\pi|}/k^{|\pi|} = 1 + O(1/k)$, and
+Lemma~\ref{lem:W0-props}(iv) plus~\eqref{eq:Wm-uniform} yield, for $n \in \{k, k-1\}$,
+\begin{align*}
+\sigma^{|\xi|}\widehat{\cG}_n(\sigma z;\xi)
+&= \left(\frac{W_0(\sigma z;a)}{W_0(\sigma;a)}\right)^{\!n}
+\left(W_\xi^{\mathrm{PPP}}(1+i\tau) + O\!\left(\frac{L(1+|\tau|)}{k}\right)\right), \\
+e^{i\sigma\tau}\left(\frac{W_0(\sigma z;a)}{W_0(\sigma;a)}\right)^{\!n}
+&= e^{-(\gamma+\alpha)} e^{\Phi_\alpha(1+i\tau)}
++ O\!\left(\bigl|e^{\Phi_\alpha(1+i\tau)}\bigr|\frac{L^2(1+\tau^2)}{k}\right).
+\end{align*}
+Combining these expansions with Lemma~\ref{lem:uniform-W-V}(ii)--(iii) and~\eqref{eq:Phi-abs} yields
+\begin{align*}
+Z_{I,k} &= e^{-(\gamma+\alpha)}\bigl(\mathcal{I}_\infty(\alpha) + O(L^r/k)\bigr), \\
+Z_{J,k} &= e^{-(\gamma+\alpha)}\bigl(L^2\mathcal{I}_\infty(\alpha) + 2L\mathcal{M}_\infty(\alpha) + O(1)\bigr),
+\end{align*}
+where $r := \max(2, \max_\lambda 2d_\lambda)$ and symmetry in $(\mu_1,\mu_2)$ collects the
+linear-$L$ terms into $2\mathcal{M}_\infty(\alpha)$. Dividing via $k W_0(\sigma; a) = \sigma^{-1}(1 + O(L/k))$
+establishes~\eqref{eq:quotient-limit}.
+\end{proof}
+
+Now define the one-dimensional moments (for integers $n \ge 0$ and $\alpha \in \R$)
+\begin{align}
+U_n(\alpha) &:= \frac{n!}{\pi}\re \int_0^\infty \frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau, \nonumber\\
+L_n(\alpha) &:= \frac{n!}{\pi}\re \int_0^\infty \bigl(\gamma + \log(1+i\tau)\bigr)\frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau. \label{eq:Un-Ln-def}
+\end{align}
+
+\begin{proposition}[Moment Reduction and Integration-by-Parts Identity]\label{prop:UL-reduction}
+For all integers $n \ge 0$ and $\alpha \in \R$:
+\begin{enumerate}
+\item[(i)] $L_n(\alpha) = U_{n+1}(\alpha) - (1+\alpha) U_n(\alpha)$.
+\item[(ii)] Writing $\widetilde{Q}_\lambda(x) = \sum_{i=0}^{d_\lambda} c_{\lambda, i} x^i$ with
+stacked vector $c \in \R^N$ ($N = \sum_{\lambda\in\Lambda_W}(d_\lambda + 1)$), we have
+$\mathcal{I}_\infty(\alpha) = c^\top I(\alpha) c$ and
+$2\mathcal{M}_\infty(\alpha) - \alpha \mathcal{I}_\infty(\alpha) = c^\top D_{\mathrm{net}}(\alpha) c$,
+where $D_{\mathrm{net}}(\alpha) := M(\alpha) + M(\alpha)^\top - \alpha I(\alpha)$ and, for basis
+indices $(\lambda_1, i), (\lambda_2, j)$ with $n := i+j$,
+\begin{align}
+I_{(\lambda_1,i),(\lambda_2,j)}(\alpha)
+&= \sum_r w_{\lambda_1\sqcup\lambda_2,\, r} \frac{n!}{(n+r)!} U_{n+r}(\alpha), \label{eq:I-entry}\\
+M_{(\lambda_1,i),(\lambda_2,j)}(\alpha)
+&= \sum_r w_{\lambda_1\sqcup\lambda_2,\, r} \frac{n!}{(n+r)!}
+\bigl(\Harm_n U_{n+r}(\alpha) - L_{n+r}(\alpha)\bigr)
+- \Harm_j I_{(\lambda_1,i),(\lambda_2,j)}(\alpha) \nonumber\\
+&\quad + \sum_{\emptyset \neq S \subseteq [\ell(\lambda_2)]}
+\frac{j!\,(s-1)!}{(j+s)!}
+\sum_r w_{\lambda_1\sqcup\lambda_{2\setminus S},\, r}
+\frac{(n+s)!}{(n+s+r)!} U_{n+s+r}(\alpha), \label{eq:M-entry}
+\end{align}
+with $s := s_{\lambda_2}(S)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Differentiating $\frac{1}{i}\frac{\dd}{\dd\tau}(e^{\Phi_\alpha(z)}/z^{n+1})
+= (\gamma+\alpha+1+\log z)e^{\Phi_\alpha(z)}/z^{n+1} - (n+1)e^{\Phi_\alpha(z)}/z^{n+2}$ ($z=1+i\tau$)
+and integrating over $[-R, R]$ drops boundary terms $O(R^{-n} e^{-\pi R/2}) \to 0$ by~\eqref{eq:Phi-abs};
+conjugation symmetry $\Phi_\alpha(\bar{z}) = \overline{\Phi_\alpha(z)}$ gives~(i).
+
+For~(ii), analytic continuation of Gamma integrals ($\re z = 1$) gives
+\begin{equation}\label{eq:gamma-moments}
+\int_0^\infty x^n e^{-zx}\dd x = \frac{n!}{z^{n+1}},
+\qquad
+\int_0^\infty x^n (\log x) e^{-zx}\dd x
+= \frac{n!}{z^{n+1}}\bigl(\Harm_n - \gamma - \log z\bigr),
+\end{equation}
+and substituting $u = x v$ gives the exact polynomial identities ($j \ge 0, s \ge 2$)
+\begin{align}
+(\cH x^j) &= x^j \int_0^1 \frac{1 - (1-v)^j}{v}\dd v
+= x^j \int_0^1 \sum_{r=0}^{j-1}(1-v)^r\dd v = \Harm_j x^j, \nonumber\\
+(B_{s-1} x^j) &= x^{j+s}\int_0^1 (1-v)^j v^{s-1}\dd v
+= \frac{j!(s-1)!}{(j+s)!} x^{j+s}. \label{eq:H-Bs-monomial}
+\end{align}
+Inserting $\widetilde{Q}_{\lambda_1}, \widetilde{Q}_{\lambda_2}$, \eqref{eq:WPPP-def}, \eqref{eq:gamma-moments},
+and~\eqref{eq:H-Bs-monomial} into~\eqref{eq:I-inf-def}--\eqref{eq:M-inf-def}, and re-indexing
+$(\mu_1,\mu_2,\lambda,S)$ with $\lambda_{\setminus S} = \mu_2$ as $(\lambda_1,\lambda_2,S)$ with
+$\mu_2 = \lambda_{2\setminus S}$, produces~\eqref{eq:I-entry}--\eqref{eq:M-entry} upon using
+$\frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(z)} z^{-(m+1)}\dd\tau = \frac{1}{m!}U_m(\alpha)$
+and symmetrizing $2 c^\top M(\alpha) c = c^\top(M(\alpha)+M(\alpha)^\top)c$.
+\end{proof}
+
+\section{Rigorous Arb Certification and Verification}\label{sec:cert}
+
+By Propositions~\ref{prop:contour-limit} and~\ref{prop:UL-reduction}, Theorem~\ref{thm:main}
+reduces rigorously to verifying $I(\alpha) \succ 0$ (certifying $\mathcal{I}_\infty(\alpha) = c^\top I(\alpha) c > 0$)
+and the Rayleigh lower bound
+\begin{equation}\label{eq:rq-cert}
+\frac{c^\top D_{\mathrm{net}}(\alpha) c}{c^\top I(\alpha) c} \ge -c^*
+\end{equation}
+at $\alpha = -523/2000$ for the exact rational witness $c \in \mathbb{Q}^{250}$ (serialized to $60$
+significant digits and parsed via exact \texttt{fmpq} rationals before conversion to Arb balls).
+While Lemma~\ref{lem:nu-pos} establishes $\mathcal{I}_\infty(\alpha) > 0$ for the radial class
+$\Lambda_0$ alone, for the mixed $\Lambda_9$ ansatz positivity (and in fact strict positive
+definiteness of the Gram matrix $I(\alpha)$) is rigorously established by interval $LDL^\top$
+factorization.
+
+To eliminate single-implementation error, generation/certification (\texttt{cert\_asymptotic.py})
+and independent verification (\texttt{verify\_asymptotic.py}) share no code and evaluate the
+moments independently:
+\begin{itemize}
+\item \textbf{Certifier (\texttt{cert\_asymptotic.py}):} Evaluates $U_0(\alpha),\dots,U_{41}(\alpha)$
+at $768$-bit precision on $[0, 200]$ (panels $[0,1,4,12,35,90,200]$, adaptive \texttt{acb.integral}
+\cite{JohanssonArb}, tolerance $10^{-145}$), adds the tail bound on $[200,\infty)$ from Lemma~\ref{lem:arb-bounds}(i),
+and computes $D_{\mathrm{net}}(\alpha)$ via Proposition~\ref{prop:UL-reduction}(i).
+\item \textbf{Independent verifier (\texttt{verify\_asymptotic.py}):} Evaluates $U_0(\alpha),\dots,U_{40}(\alpha)$
+and \emph{directly} evaluates $L_0(\alpha),\dots,L_{40}(\alpha)$ \emph{without} the IBP identity on
+the independent geometric grid $[0, 0.35, 0.9, 2.0, 4.5, 10, 22, 45, 85, 145, 225]$ ($T = 225$) using
+$240$-node Gauss--Legendre quadrature at $768$-bit Arb precision. Every node and weight $(x_i, w_i)$
+($i = 0, \dots, 239$) is computed inside Arb via \texttt{arb.legendre\_p\_root(240, i, weight=True)},
+returning certified midpoint-radius balls with zero external floating-point tables.
+\end{itemize}
+Numerically, across the $W \le 9$ slice ($30$ blocks, $N = 250$), the asymptotic Rayleigh quotient
+varies by only $\approx 10^{-7}$ over $\alpha \in [-0.262, -0.260]$ ($\eta \approx -0.26098864$ at
+$\alpha = -0.262$, $-0.2609886366$ at $-0.2615$, and $-0.26098873$ at $-0.260$), making
+$\alpha = -523/2000 = -0.2615$ a natural low-denominator rational shift capturing $7$ significant
+digits of the flat optimum while keeping concatenated partition lengths $\le 8$ and the $I(\alpha)$
+Cholesky pivot ratio $7.90 \times 10^{-11}$.
+
+\begin{lemma}[Analytic Tail and Bernstein-Ellipse Error Bounds]\label{lem:arb-bounds}
+Fix $\alpha \in \R$, $T \ge 10$, and integer $n \ge 0$, and put $C_T := \gamma + \frac{\pi}{2} + \log(1+T)$.
+\begin{enumerate}
+\item[(i)] The truncated tails in~\eqref{eq:Un-Ln-def} on $[T,\infty)$ satisfy
+\begin{align}
+\left| U_n(\alpha) - \frac{n!}{\pi}\re \int_0^T \frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau \right|
+&\le \frac{2 e^{\gamma+\alpha+1} n!\, e^{-\pi T/2}}{\pi^2 T^n}, \label{eq:Un-tail}\\
+\left| L_n(\alpha) - \frac{n!}{\pi}\re \int_0^T \bigl(\gamma+\log(1+i\tau)\bigr)
+\frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau \right|
+&\le \frac{n!\, e^{\gamma+\alpha+1} e^{-\pi T/2}}{\pi T^n}\left(\frac{2 C_T}{\pi} + \frac{4}{\pi^2 T}\right). \label{eq:Ln-tail}
+\end{align}
+\item[(ii)] Let $[a,b] = [\mu - h, \mu + h] \subset [0, T]$ ($h > 0$), let $E_\rho$ ($\rho > 1$) be the
+Bernstein ellipse with semi-axes $K := \frac{1}{2}(\rho+\rho^{-1})$ and $B := \frac{1}{2}(\rho-\rho^{-1})$,
+and let $\overline{D}_\rho$ be its closed interior. If $(1 - h B > 0) \lor (\mu - h K > 0)$, then for
+all $u \in \overline{D}_\rho$, $z(u) := 1 + i(\mu + h u)$ avoids the branch cut $(-\infty, 0]$.
+\item[(iii)] Under the condition of~(ii), if $f$ is holomorphic on a neighborhood of $\mu + h\overline{D}_\rho$
+and $M := \sup_{u \in E_\rho} |f(\mu + h u)|$, then $m$-point Gauss--Legendre quadrature $Q_m$ on $[a,b]$ satisfies
+\begin{equation}\label{eq:GL-bernstein-err}
+\left|\int_a^b f(t)\dd t - Q_m[f]\right| \le \frac{8 h M}{(\rho - 1)\rho^{2m-1}}.
+\end{equation}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+For~(i), $\arctan\tau \ge \frac{\pi}{2} - \frac{1}{\tau}$ and~\eqref{eq:Phi-abs} yield
+$|e^{\Phi_\alpha(1+i\tau)}/(1+i\tau)^{n+1}| \le e^{\gamma+\alpha+1} T^{-n} e^{-\pi\tau/2}$ ($\tau \ge T$),
+giving~\eqref{eq:Un-tail}. Also $|\gamma+\log(1+i\tau)| \le C_T + \frac{\tau-T}{T}$, whose integral against
+$e^{-\pi\tau/2}$ proves~\eqref{eq:Ln-tail}.
+
+For~(ii), any $u = x_u + i y_u \in \overline{D}_\rho$ has $|x_u| \le K$ and $|y_u| \le B$, so
+$1 - hB > 0 \implies \re z(u) \ge 1 - hB > 0$ and $\mu - hK > 0 \implies \im z(u) \ge \mu - hK > 0$.
+
+For~(iii), $g(u) := f(\mu+h u)$ pulls back under $u = \frac{1}{2}(w+w^{-1})$ to a holomorphic function
+on an open neighborhood of $\{\rho^{-1} \le |w| \le \rho\}$. In its Chebyshev expansion
+$g(u) = \sum_{j=0}^\infty a_j T_j(u)$ ($T_j(\frac{w+w^{-1}}{2}) = \frac{1}{2}(w^j+w^{-j})$), matching
+Laurent coefficients on $|w| = 1$ gives $c_j = a_j/2$ ($j \ge 1$); shifting the contour to $|w| = \rho$ yields
+$a_j = \frac{1}{\pi i}\oint_{|w|=\rho} g(\frac{w+w^{-1}}{2}) w^{-j-1}\dd w$, hence $|a_j| \le 2M\rho^{-j}$ \cite{Trefethen}.
+Since $Q_m$ is exact up to degree $2m-1$ and $|\int_{-1}^1 T_j - Q_m[-1,1][T_j]| \le 4$, rescaling gives~\eqref{eq:GL-bernstein-err}.
+\end{proof}
+
+Executing \texttt{verify\_asymptotic.py} checks $(1-hB > 0)\lor(\mu-hK > 0)$ on every panel, encloses
+$M = \sup_{u \in E_\rho} |G(1+i(\mu+hu))|$ rigorously by partitioning $[0, 2\pi]$ into $32$ angular
+intervals $\theta \in [2\pi j/32,\, 2\pi(j+1)/32]$, evaluating each ellipse arc $u(\theta) =
+K\cos\theta + i B\sin\theta$ in an Arb complex box \texttt{acb} (checking holomorphicity on every box;
+since the holomorphic integrands $G(z)$ in~\eqref{eq:Un-Ln-def} satisfy $\overline{G(\bar{z})} = G(z)$
+and $E_\rho = \overline{E_\rho}$, $t \mapsto \frac{1}{2}(G(1+it)+G(1-it))$ extends $\re G(1+it)$
+holomorphically to $\mu + h\overline{D}_\rho$ with modulus $\le M$), adds~\eqref{eq:GL-bernstein-err} and~\eqref{eq:Un-tail}--\eqref{eq:Ln-tail},
+confirms agreement with all stored moments $U_0,\dots,U_{40}$ (the independently computed
+$U_0,\dots,U_{40}$ and $L_0,\dots,L_{40}$ achieve maximum relative Arb radius $1.30 \times 10^{-148}$),
+verifies $I(\alpha) \succ 0$ via interval $LDL^\top$, passes all $9/9$ adversarial tamper-rejection tests,
+certifies~\eqref{eq:rq-cert}, and establishes
+\begin{equation}\label{eq:eta-cert}
+\begin{aligned}
+\eta_* \in \bigl[&{-0.26098863656469156541919317124794770922900940468892},\\
+&{-0.26098863656469156541919317124794770922900940468891}\bigr]
+\end{aligned}
+\end{equation}
+(outer-rounded to $50$ decimal digits from the $768$-bit Arb ball of radius $4.03 \times 10^{-149}$),
+proving Theorem~\ref{thm:main}.
+
+As independent cross-checks (non-certified supporting evidence for Proposition~\ref{prop:exact-laplace} and
+Proposition~\ref{prop:contour-limit}): comparing Proposition~\ref{prop:exact-laplace} against direct 5D real-space
+Duffy simplex quadrature ($14$-point Gauss--Legendre per axis vs.\ $320$-bit Arb Laplace) at $k = 5$ on all $30$
+$\Lambda_9$ blocks yields relative errors $5.64 \times 10^{-8}$ ($I$), $8.01 \times 10^{-8}$ ($kJ$), and
+$2.37 \times 10^{-8}$ ($R_5(F) = 1.95890046\dots$). Table~\ref{tab:finite-k} evaluates $R_k(F) - \log k$ for
+the $\Lambda_9$ witness across $k = 10^3,\dots,10^8$ in $448$-bit Arb Laplace arithmetic ($64$-node composite
+Gauss--Legendre, spot-checked against $80$ nodes at $k = 10^6$ with $448$-bit Arb difference $3.71 \times 10^{-23}$),
+confirming monotonic shrinkage of the $O(L^r/k)$ remainder $\Delta_L(k) := (R_k(F) - L) - \eta_{L\text{-ref}}(k)$,
+where
+\[
+\eta_{L\text{-ref}}(k) := \frac{L^2\mathcal{I}_\infty(\alpha) + 2L\mathcal{M}_\infty(\alpha) + \mathcal{N}_\infty(\alpha)}{(L+\alpha)\mathcal{I}_\infty(\alpha)} - L
+\]
+retains the $O(1)$ inner integral $\mathcal{N}_\infty(\alpha) := \frac{1}{2\pi}\int_{-\infty}^\infty e^{\Phi_\alpha(1+i\tau)}
+\sum_{\mu_1,\mu_2\in\Lambda_9} W_{\mu_1\sqcup\mu_2}^{\mathrm{PPP}}(1+i\tau)\, N_{\mu_1,\mu_2}^{(2)}(\tau)\dd\tau$,
+evaluated in $384$-bit Arb via the second-log moments
+$L_n^{(2)}(\alpha) := \frac{n!}{\pi}\re\int_0^\infty (\gamma+\log(1+i\tau))^2 \frac{e^{\Phi_\alpha(1+i\tau)}}{(1+i\tau)^{n+1}}\dd\tau$
+and the exact IBP identity $L_n^{(2)}(\alpha) = L_{n+1}(\alpha) - (1+\alpha)L_n(\alpha) - (n+1)^{-1}U_{n+1}(\alpha)$.
+
+\begin{table}[ht]
+\centering
+\caption{Finite-$k$ convergence of the $\Lambda_9$ witness ($448$-bit Arb Laplace) toward its
+$768$-bit certified asymptotic limit, together with the $384$-bit remainder $\Delta_L(k)$ and a
+quadratic least-squares fit in $1/(L+\alpha)$ over $k \in \{10^5, 10^6, 10^7, 10^8\}$.}\label{tab:finite-k}
+\small
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$k$ & $R_k(F) - \log k$ & $\Delta_L(k)$ & Gain vs.\ \cite{Lewulis} limit ($-0.273572$) \\
+\midrule
+$10^3$ & $-0.135735$ & $+1.67 \times 10^{-3}$ & $+0.137837$ \\
+$10^4$ & $-0.168933$ & $+2.71 \times 10^{-4}$ & $+0.104639$ \\
+$10^5$ & $-0.187944$ & $+4.38 \times 10^{-5}$ & $+0.085628$ \\
+$10^6$ & $-0.200383$ & $+6.56 \times 10^{-6}$ & $+0.073189$ \\
+$10^7$ & $-0.209188$ & $+9.23 \times 10^{-7}$ & $+0.064384$ \\
+$10^8$ & $-0.215757$ & $+1.24 \times 10^{-7}$ & $+0.057815$ \\
+\midrule
+$1/(L+\alpha)$ fit & $-0.260771$ & --- & $+0.012801$ \\
+Certified limit & $\mathbf{-0.260989}$ & --- & $\mathbf{+0.012583}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{remark}[Open Question]
+Combining Theorem~\ref{thm:main} with the barrier~\eqref{eq:pm8b-barrier} gives
+\[
+0 \le \liminf_{k\to\infty}(\log k - M_k) \le \limsup_{k\to\infty}(\log k - M_k) \le 0.26098863656469156542.
+\]
+It remains open whether $\lim_{k\to\infty}(\log k - M_k)$ exists and is strictly positive, or
+whether $M_k = \log k - o(1)$.
+\end{remark}
+
+\section{Reproducibility and Artifact Verification}\label{sec:repro}
+
+The certificate, independent verifier, finite-$k$ checks, and both language versions of this manuscript
+are archived at:
+\begin{center}
+\url{https://doi.org/10.5281/zenodo.24528079}
+\end{center}
+From the repository root, executing the verification command
+\begin{samepage}
+\begin{verbatim}
+python verify_asymptotic.py cert_asymptotic.json --entry C
+\end{verbatim}
+\end{samepage}
+runs the independent Bernstein-ellipse verifier in approximately $24.5\text{ s}$ (tested on
+\texttt{Windows~11}, Python \texttt{3.13.17}, \texttt{python-flint 0.9.0}, peak RSS $77.8\text{ MB}$),
+while \texttt{python verify\_all.py} runs the complete suite in $18\text{--}36\text{ s}$ on at most
+$4$ CPU threads (with \texttt{numpy 2.5.4}, \texttt{scipy 1.18.1}, and \texttt{mpmath 1.4.1} used
+for supplementary checks). Canonical SHA-256 checksums appear in Table~\ref{tab:sha256}.
+
+\begin{table}[ht]
+\centering
+\caption{Canonical SHA-256 digests of the asymptotic certificate and independent Arb verifier.}\label{tab:sha256}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Artifact & SHA-256 digest \\
+\midrule
+\texttt{cert\_asymptotic.json} & \texttt{\scriptsize 541e5d4fd45aff5905b38aa30dd5b77cc4d9f11a360823946498f26e80e02921} \\
+\texttt{verify\_asymptotic.py} & \texttt{\scriptsize e3721c23fdeaec99c95d9a6d34ae83ee9516410f6ce035d6cf53efaf53970a78} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Computational Assistance and Verification}
+Numerical exploration and code prototyping were assisted by computational and AI tools. Every proof
+in this manuscript was audited analytically, and every reported asymptotic constant and moment bound
+is independently verified deterministically via Arb ball arithmetic (\texttt{verify\_asymptotic.py}).
+
+\begin{thebibliography}{9}\raggedright
+
+\bibitem{GPY}
+D.~A.~Goldston, J.~Pintz, and C.~Y.~Y{\i}ld{\i}r{\i}m,
+\emph{Primes in tuples.~I},
+Ann. of Math. (2) \textbf{170} (2009), no.~2, 819--862.
+
+\bibitem{JohanssonArb}
+F.~Johansson,
+\emph{Arb: efficient arbitrary-precision midpoint-radius interval arithmetic},
+IEEE Trans. Comput. \textbf{66} (2017), no.~8, 1281--1292.
+
+\bibitem{Lewulis}
+P.~Lewulis,
+\emph{Clusters of primes revisited},
+preprint (October 2026), \href{https://arxiv.org/abs/2610.41113}{arXiv:2610.41113}.
+
+\bibitem{Maynard}
+J.~Maynard,
+\emph{Small gaps between primes},
+Ann. of Math. (2) \textbf{181} (2015), no.~1, 383--413.
+
+\bibitem{PM8b}
+D.~H.~J.~Polymath,
+\emph{Variants of the Selberg sieve, and bounded intervals containing many primes},
+Res. Math. Sci. \textbf{1} (2014), Art.~12, 83 pp.
+
+\bibitem{Stadlmann2025}
+J.~Stadlmann,
+\emph{On primes in arithmetic progressions and bounded gaps between many primes},
+Adv. Math. \textbf{468} (2025), Art.~110190, \href{https://doi.org/10.1016/j.aim.2025.110190}{doi:10.1016/j.aim.2025.110190}
+(\href{https://arxiv.org/abs/2309.00425}{arXiv:2309.00425}).
+
+\bibitem{Stadlmann2026}
+J.~Stadlmann,
+\emph{Bounded gaps between primes},
+preprint (August 2026), \href{https://arxiv.org/abs/2608.31126}{arXiv:2608.31126}.
+
+\bibitem{Trefethen}
+L.~N.~Trefethen,
+\emph{Is Gauss quadrature better than Clenshaw--Curtis?},
+SIAM Rev. \textbf{50} (2008), no.~1, 67--87.
+
+\bibitem{Zhang}
+Y.~Zhang,
+\emph{Bounded gaps between primes},
+Ann. of Math. (2) \textbf{179} (2014), no.~3, 1121--1174.
+
+\end{thebibliography}
+
+\end{document}
